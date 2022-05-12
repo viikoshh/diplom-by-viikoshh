@@ -1,0 +1,10 @@
+.form{
+    width: 350px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 15%;
+}
+body{
+    background-image: url("image/фон.jpg");
+    background-repeat: repeat;
+}
