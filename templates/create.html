@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %} Добавить запись в меню {% endblock %}
+
+{% block main %}
+
+<main id="main">
+
+    <section id="add_item">
+        <div class="container">
+            <h2 class="menu">Добавление товара</h2>
+            <form method="post" class="create-input">
+                <label for="name"> <h6>Название блюда</h6> </label>
+                <input type="text" class="form-control" name="name" id="name" placeholder="Введите название блюда">
+                <br>
+                <label for="name"> <h6>Изображение блюда</h6> </label>
+                <input type="text" class="form-control" name="photo" id="photo" placeholder="Введите путь до изображения блюда">
+                <br>
+                <label for="name"> <h6>Цена блюда</h6> </label>
+                <input type="text" class="form-control" name="price" id="price" placeholder="Введите цену блюда"><br>
+                <label for="name"> <h6>Вес блюда</h6> </label>
+                <input type="text" class="form-control" name="weight" id="weight" placeholder="Введите вес блюда"><br>
+                <label for="name"> <h6>Состав блюда</h6> </label>
+                <input type="text" class="form-control" name="composition" id="composition" placeholder="Введите состав блюда">
+                <br>
+                <label for="name"> <h6>КБЖУ блюда</h6> </label>
+                <input type="text" class="form-control" name="KBJU" id="KBJU" placeholder="Введите КБЖУ на 100г блюда" value="   ккал; белки  г; жиры  г; углеводы  г">
+                <br>
+                <label for="name"> <h6>История блюда</h6> </label>
+                <input type="text" class="form-control" name="discover_text" id="discover_text" placeholder="Предложите ингридиент или узнать историю блюда:'Узнайте подробнее о...' ">
+                <br>
+                <label for="name"> <h6>Страничка с историей блюда</h6> </label>
+                <input type="url" class="form-control" name="discover_url" id="discover_url" placeholder="Введите ссылку на страничку с историей о блюде">
+                <br>
+                <button class="btn btn-success">Добавить позицию меню</button>
+            </form>
+        </div>
+    </section>
+</main>
+
+{% endblock %}

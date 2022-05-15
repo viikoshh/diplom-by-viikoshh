@@ -1,36 +1,12 @@
-<!doctype html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style_slide.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
-    <title>Smart-Cafe</title>
-</head>
-<body>
-    <div class="container">
-    <header id="header" class="header d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-        <ul class="nav leftstr col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-            <li><a href="#" class="menu-up nav-link px-2 link-dark">Главная</a></li>
-            <li><a href="#about" class="menu-up nav-link px-2 link-dark">О нас</a></li>
-            <li><a href="#menu" class="menu-up nav-link px-2 link-dark">Меню</a></li>
-            <li><a href="#" class="menu-up nav-link px-2 link-dark">Заказ</a></li>
-            <li><a href="#Contact" class="menu-up nav-link px-2 link-dark">Контакты</a></li>
-        </ul>
-        <div class="rightbtn col-md-3 text-end login">
-          <a type="button" class="btn btn-outline-primaryy me-2" href="login.html">Вход</a>
-          <button type="button" class="btn btn-warning">Регистрация</button>
-        </div>
-    </header>
-  </div>
-    <div id="up">
-        <a href="#header" class="up nav-link px-2 link-dark">Наверх</a>
-    </div>
-    <main id="main">
+{% extends 'base.html' %}
 
+{% block title %}
+Smart-Cafe
+{% endblock %}
+
+{% block main %}
+
+<main id="main">
 
         <!-- слайдшоу/-->
         <section id="slaidshow">
@@ -91,15 +67,15 @@
             <div class="container">
                 <div class="cont">
                     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" name="1 pos">
-
+                      {% for el in data %}
                       <div class="col">
                           <div class="card shadow-sm">
                               <div class="image image-menu">
-                                <img class="image" src="static/image/1.png" width="420" height="210" alt="Лепешка сулугуни">
+                                <img class="image" src="{{el.photo}}"  width="420" height="210" alt="{{ el.name }}">
                               </div>
-                              <h6 class="cardtext">Лепешка с сыром сулугуни,<br> подогретая в гриле</h6>
-                              <p class="price"  style="text-align: center;margin: 0px 0px 8px;">118р/шт</p>
-                              <input type="checkbox" class="read-more-checker" id="read-more-checker1">
+                              <h6 class="cardtext">{{ el.name }}</h6>
+                              <p class="price"  style="text-align: center;margin: 0px 0px 8px;">{{ el.price }}р/шт</p>
+                              <input type="checkbox" class="read-more-checker" id="read-more-checker{{ el.id }}">
                               <div class="card-body limited">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="btn-group">
@@ -107,144 +83,22 @@
                                     </div>
                                 </div>
                                 <br>
-                                <p class="card-text" >Масса: 115г</p>
-                                <p class="card-text">Состав: тесто дрожжевое, сыр "Сулугуни", яйцо куриное.</p>
-                                <p class="card-text">КБЖУ на 100г: 260 ккал; белки 6,5г; жиры 13г; углеводы 30г </p>
-                                <p class="card-text leftstr" >Узнайте подробнее о сыре сулугуни: </p>
-                                <a href="https://ru.wikipedia.org/wiki/%D0%A1%D1%83%D0%BB%D1%83%D0%B3%D1%83%D0%BD%D0%B8" target="_blank" class="rightbtn btn btn-groupp btn-sm btn-outline-secondary"> Узнать</a>
+                                <p class="card-text" >Масса: {{el.weight}}г</p>
+                                <p class="card-text">Состав: {{el.composition}}</p>
+                                <p class="card-text">КБЖУ на 100г: {{el.KBJU}} </p>
+                                  {% if el.discover_text %}
+                                <p class="card-text leftstr" >Узнайте подробнее о {{ el.discover_text }}: </p>
+                                <a href="{{ el.discover_url }}" target="_blank" class="rightbtn btn btn-groupp btn-sm btn-outline-secondary"> Узнать</a>
+                                  {% endif %}
 
                              </div>
                             <div class="bottom"></div>
-                            <label for="read-more-checker1" class="read-more-button"> </label>
+                            <label for="read-more-checker{{ el.id }}" class="read-more-button"> </label>
                           </div>
                       </div>
+                     {% endfor %}
 
-                      <div class="col">
-                          <div class="card shadow-sm">
-                              <div class="image image-menu">
-                                <img class="image" src="static/image/2.png" width="420" height="210" alt="Сэндвич с курицей">
-                              </div>
-                              <h6 class="cardtext">Сэндвич с нежной запеченной курицей и соусом</h6>
-                              <p class="price"  style="text-align: center;margin: 0px 0px 8px;">180р/шт</p>
-                              <input type="checkbox" class="read-more-checker" id="read-more-checker2">
-                              <div class="card-body limited">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">Заказать</button>
-                                    </div>
-                                </div>
-                                <br>
-                                <p class="card-text" >Масса: 200г</p>
-                                <p class="card-text">Состав: чиабатта, курица запеченная (куриное филе), майонез.</p>
-                                <p class="card-text">КБЖУ на 100г: 317 ккал; белки 12,8г; жиры 17,8г; углеводы 26,4г </p>
-                             </div>
-                            <div class="bottom"></div>
-                            <label for="read-more-checker2" class="read-more-button"> </label>
-                          </div>
-                      </div>
 
-                      <div class="col">
-                          <div class="card shadow-sm">
-                              <div class="image image-menu">
-                                <img class="image" src="static/image/3.png" width="420" height="210" alt="Сэндвич с тунцом">
-                              </div>
-                              <h6 class="cardtext">Сытный сэндвич с нежным тунцом на тостовом хлебе</h6>
-                              <p class="price"  style="text-align: center;margin: 0px 0px 8px;">220р/шт</p>
-                              <input type="checkbox" class="read-more-checker" id="read-more-checker3">
-                              <div class="card-body limited">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">Заказать</button>
-                                    </div>
-                                </div>
-                                <br>
-                                <p class="card-text" >Масса: 230г</p>
-                                <p class="card-text">Состав: хлеб тостовый светлый, сыр "Гауда", яйцо куриное,
-                                    тунец консервированный, майонез м.д.ж. 67%, огурцы свежие, лимоны свежие.</p>
-                                <p class="card-text">КБЖУ на 100г: 303  ккал; белки 13,14 г; жиры 18,12 г; углеводы 21,84 г </p>
-
-                             </div>
-                            <div class="bottom"></div>
-                            <label for="read-more-checker3" class="read-more-button"> </label>
-                          </div>
-                      </div>
-
-                      <div class="col">
-                          <div class="card shadow-sm">
-                              <div class="image image-menu">
-                                <img class="image" src="static/image/4.png" width="420" height="210" alt="Бейгл с лососем">
-                              </div>
-                              <h6 class="cardtext">Свежий бейгл с слабосоленым лососем и овощами</h6>
-                              <p class="price"  style="text-align: center;margin: 0px 0px 8px;">230р/шт</p>
-                              <input type="checkbox" class="read-more-checker" id="read-more-checker4">
-                              <div class="card-body limited">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">Заказать</button>
-                                    </div>
-                                </div>
-                                <br>
-                                <p class="card-text" >Масса: 180г</p>
-                                <p class="card-text">Состав: бейгл, слабосоленая семга, майонез,томаты свежие, салат асйберг. </p>
-                                <p class="card-text">КБЖУ на 100г: 294   ккал; белки 7,5 г; жиры 19,6 г; углеводы 21,9 г </p>
-                                <p class="card-text leftstr" > Узнайте подробнее о происхождении бейгла: </p>
-                                <a href="https://ru.wikipedia.org/wiki/%D0%91%D0%B5%D0%B9%D0%B3%D0%BB" target="_blank" class="rightbtn btn btn-groupp btn-sm btn-outline-secondary"> Узнать</a>
-
-                             </div>
-                            <div class="bottom"></div>
-                            <label for="read-more-checker4" class="read-more-button"> </label>
-                          </div>
-                      </div>
-
-                      <div class="col">
-                          <div class="card shadow-sm">
-                              <div class="image image-menu">
-                                <img class="image" src="static/image/5.png" width="420" height="210" alt="Творожная запенка">
-                              </div>
-                              <h6 class="cardtext">Классическая творожная запенканка идеально подойдет к завтраку</h6>
-                              <p class="price"  style="text-align: center;margin: 0px 0px 8px;">145р/шт</p>
-                              <input type="checkbox" class="read-more-checker" id="read-more-checker5">
-                              <div class="card-body limited">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">Заказать</button>
-                                    </div>
-                                </div>
-                                <br>
-                                <p class="card-text" >Масса: 140г</p>
-                                <p class="card-text">Состав: творог 9%, сахар, мука пшеничная, яйцо куриное, масло подсолнечное</p>
-                                <p class="card-text">КБЖУ на 100г: 225,2  ккал; белки 14,2 г; жиры 8,8 г; углеводы 22 г </p>
-
-                             </div>
-                            <div class="bottom"></div>
-                            <label for="read-more-checker5" class="read-more-button"> </label>
-                          </div>
-                      </div>
-
-                      <div class="col">
-                          <div class="card shadow-sm">
-                              <div class="image image-menu">
-                                <img class="image" src="static/image/6.png" width="420" height="210" alt="Какао">
-                              </div>
-                              <h6 class="cardtext">Ароматный согревающий напиток из натурального какао и молока, 330мл</h6>
-                              <p class="price"  style="text-align: center;margin: 0px 0px 8px;">150р/шт</p>
-                              <input type="checkbox" class="read-more-checker" id="read-more-checker6">
-                              <div class="card-body limited">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">Заказать</button>
-                                    </div>
-                                </div>
-                                <br>
-                                <p class="card-text" >Масса/объем: 330мл</p>
-                                <p class="card-text">Состав: какао-порошок, молоко 3,2%, сахар.</p>
-                                <p class="card-text">КБЖУ на 100г: 112  ккал; белки 3,7 г; жиры 3,6 г; углеводы 14,2 г </p>
-
-                             </div>
-                            <div class="bottom"></div>
-                            <label for="read-more-checker6" class="read-more-button"> </label>
-                          </div>
-                      </div>
 
 
 
@@ -316,35 +170,5 @@
 
         </section>
     </main>
-    <footer id="footer">
-        <div class="container">
-            <h5>ООО"Умное кафе"</h5>
-        </div>
-    </footer>
 
-
-            <script>
-            var slideIndex = 0;
-            showSlides();
-
-            function showSlides() {
-                var i;
-                var slides = document.getElementsByClassName("mySlides");
-                var dots = document.getElementsByClassName("dot");
-                for (i = 0; i < slides.length; i++) {
-                   slides[i].style.display = "none";
-                }
-                slideIndex++;
-                if (slideIndex > slides.length) {slideIndex = 1}
-                for (i = 0; i < dots.length; i++) {
-                    dots[i].className = dots[i].className.replace(" active", "");
-                }
-                slides[slideIndex-1].style.display = "block";
-                dots[slideIndex-1].className += " active";
-                setTimeout(showSlides, 2000); // Change image every 2 seconds
-            }
-            </script>
-
-
-</body>
-</html>
+{% endblock %}

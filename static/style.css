@@ -338,6 +338,9 @@ footer{
     text-align: center;
     padding: 20px;
     margin-top: 30px;
+    bottom: 0;
+    position: fixed;
+    width: 100%;
 }
 
 
@@ -414,5 +417,13 @@ footer{
     font-family: 'Montserrat', sans-serif;
     font-width: 700;
     font-size: 17px;
-
     }
+
+.create-input{
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+#add_item{
+    height: 1000px;
+}
