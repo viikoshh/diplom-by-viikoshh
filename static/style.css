@@ -165,7 +165,7 @@ button{text-transform:none;}
 .btn-primaryy:active:focus{box-shadow:0 0 0 .25rem rgba(255, 193, 7,.5);}
 .btn-primaryy:disabled{color:#000;background-color:#ffc107;border-color:#ffc107;}
 .btn-outline-primaryy{color:#000;border-color:#000;}
-.btn-outline-primaryy:hover{color:#000;background-color:#ffc107;border-color:#000;}
+.btn-outline-primaryy:hover{color:#000;background-color:#ffc107;border-color:#ffc107;}
 .btn-outline-primaryy:focus{box-shadow:0 0 0 .25rem rgba(255, 193, 7,.5);}
 .btn-outline-primaryy:active{color:#000;background-color:#ffc107;border-color:#ffc107;}
 .btn-outline-primaryy:active:focus{box-shadow:0 0 0 .25rem rgba(255, 193, 7,.5);}
@@ -339,7 +339,6 @@ footer{
     padding: 20px;
     margin-top: 30px;
     bottom: 0;
-    position: fixed;
     width: 100%;
 }
 

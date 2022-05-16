@@ -93,3 +93,7 @@ body{display:flex;align-items:center;padding-top:40px;padding-bottom:40px;backgr
         font-size: 12px;
         font-style: italic;
     }
+.message{
+    color: #fff;background-color: #ff577b;border-radius:4px;
+    padding:1.25rem 2.5rem 1.25rem 1.5rem;position:relative;width: 1000px;margin-left: auto;margin-right: auto;
+}

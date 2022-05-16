@@ -1,14 +1,24 @@
-from flask import Flask, render_template,session, request, redirect, Markup
+from flask import Flask, render_template, session, request, redirect, Markup
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.debug = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///base_menu.db'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/viikoshh/diplom-by-viikoshh/base_menu.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'hP51NJG8DrIj1oQi63Z5syHaQ8TTUwX6eT4UvCPYWoaXET4zSYxdn5f50ZPLoFGtoCeM3WDWaFKFpJ3axvdNtjJj1rXnWtJdYP'
 db = SQLAlchemy(app)
-#app.secret_key = 'секретный ключ'
+login_manager = LoginManager(app)
+login_manager.login_view = 'auth.login'
+login_manager.init_app(app)
+
+
+@login_manager.user_loader
+def load_user(id):
+    return Client.query.get(int(id))
 
 
 class Item(db.Model):
@@ -29,7 +39,7 @@ class Item(db.Model):
         return
 
 
-class Client(db.Model):
+class Client(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name_client = db.Column(db.String(100), nullable=True)
     login = db.Column(db.String(100), nullable=False, unique=True)
@@ -49,12 +59,23 @@ def index():
     return render_template('index.html', data=items)
 
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    if request.method == "POST":
+        login = request.form['login']
+        password = request.form['password']
+
+        user = Client.query.filter_by(login=login).first()#
+        if not user or not check_password_hash(user.password_hash, password):
+            auth_error = Markup('Ошибка! Повторите попытку авторизации')
+            return render_template('login.html', auth_error=auth_error)
+        login_user(user)
+        return redirect('/')
+    else:
+        return render_template('login.html')
 
 
-@app.route('/sign', methods=['POST', 'GET'])
+@app.route('/sign', methods=['GET','POST'])
 def sign():
     #if 'hash' in session:
     #    connection = sqlite3.connect('base_menu.db')
@@ -76,41 +97,48 @@ def sign():
     if request.method == "POST":
         name_client = request.form['name_client']
         login = request.form['login']
-        password = request.form['password']
         email = request.form['email']
         telephone = request.form['telephone']
         categorya = request.form['categorya']
         allergy = request.form['allergy']
-
+        print(allergy)
+        password = request.form['password']
         password_hash = generate_password_hash(password)
-
         connection = sqlite3.connect('base_menu.db')
+        #connection = sqlite3.connect('///home/viikoshh/diplom-by-viikoshh/base_menu.db')
         cur = connection.cursor()
         cur.execute("SELECT * FROM client WHERE login='" + login + "'")
         rows = cur.fetchall()
         if (len(rows)):
-            login_incorrect = Markup('<span class="errorMsg">Такой логин уже существует!</span>')
+            login_incorrect = Markup('Такой логин уже существует!')
             connection.close()
             return render_template('sign.html', login_incorrect=login_incorrect)
 
         cur.execute("SELECT * FROM client WHERE email='" + email + "'")
         rows = cur.fetchall()
         if (len(rows)):
-            email_incorrect = Markup('<span class="errorMsg">Такой email уже существует!</span>')
+            email_incorrect = Markup('Такой email уже существует!')
             connection.close()
             return render_template('sign.html', email_incorrect=email_incorrect)
-
-        client = Client(name_client=name_client, login=login, password_hash=password_hash, email=email, telephone=telephone,categorya=categorya, allergy=allergy)
-
+        client = Client(name_client=name_client, login=login, password_hash=password_hash, email=email, telephone=telephone, categorya=categorya, allergy=allergy)
+        #hash = generate_password_hash(password)
+        #result = check_password_hash(hash, password)
+        #if result:
+        #    if 'hash' in session:
+        #        print("Авторизован ")
+        #    else:
+        #        session['login'] = login  # настройка данных сессии
+        #        session['hash'] = hash  # настройка данных
+        #        print(" Регистрация прошла успешно")
         try:
             db.session.add(client)
             db.session.commit()
             return redirect('/')
         except:
-            message_error = Markup('<span class="errorMsg">Возникла ошибка! Проверьте, все ли поля заполнены</span>')
+            message_error = Markup('Возникла ошибка! Проверьте, все ли поля заполнены')
             connection.close()
             return render_template('sign.html', message_error=message_error)
-
+        connection.close()
     else:
         return render_template('sign.html')
 
@@ -129,7 +157,7 @@ def create():
         season = request.form['season']
         time_day = request.form['time_day']
         category = request.form['category']
-        connection = sqlite3.connect('base_menu.db')
+        #connection = sqlite3.connect('base_menu.db')
 
         item = Item(name=name, photo=photo, price=price, weight=weight, composition=composition, KBJU=KBJU, discover_text=discover_text, discover_url=discover_url, season=season, time_day=time_day, category=category)
 
@@ -139,6 +167,7 @@ def create():
             return redirect('/')
         except:
             return "Не все поля заполнены!"
+
     else:
         return render_template('create.html')
 

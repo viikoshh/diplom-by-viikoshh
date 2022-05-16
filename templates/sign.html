@@ -8,15 +8,32 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style_sign.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
     <title>Регистрация</title>
 </head>
 <body class="text-center">
 
     <main class="form-signin">
      <div class="container">
+      <h1 class="h3 mb-3 fw-normal" style="margin-top: 50px">Регистрация</h1>
+         {% if message_error %}
+            <div class="message" style="background-color: #ff577b">
+                {{ message_error }}
+            </div>
+         {% endif %}
+         {% if login_incorrect %}
+            <div  class="message" style="background-color: #ff577b">
+                {{ login_incorrect }} Попробуйте  <a href="/login">авторизоваться</a>.
+            </div>
+         {% endif %}
+         {% if email_incorrect %}
+            <div class="message" style="background-color: #ff577b">
+                {{ email_incorrect }} Попробуйте  <a href="/login">авторизоваться</a>.
+            </div>
+         {% endif %}
       <form method="post" class="form">
-        <h1 class="h3 mb-3 fw-normal">Регистрация</h1>
-        {{ message_error }}
+
+
         <div class="form-floating">
           <input type="text" class="form-control" id="name_client" name="name_client" placeholder="Name">
           <label for="name_client">Введите свое имя</label>
@@ -25,7 +42,6 @@
         <div class="form-floating" style="margin-top: 10px">
           <input type="text" class="form-control" id="login" name="login" placeholder="Login">
           <label for="login">Придумайте логин</label>
-            {{ login_incorrect }}
         </div>
         <div class="form-floating" style="margin-top: 10px">
           <input type="password" class="form-control" id="password" name="password" placeholder="Password">
@@ -38,7 +54,6 @@
         <div class="form-floating" style="margin-top: 10px">
           <input type="email" class="form-control" id="email" name="email" placeholder="Email">
           <label for="email">Введите свою почту</label>
-            {{ email_incorrect }}
         </div>
         <div class="form-floating" style="margin-top: 10px">
           <input type="tel" class="form-control" id="telephone" name="telephone" placeholder="Telephone">
@@ -66,11 +81,10 @@
 
         <div class="form-floating allergy">
           <label for="allergy" style="margin-top: 20px; width: 100%;text-align: left" > <h6>
-              Выберите продукты, которые хотели бы исключить из меню </h6> </label> <br>
-          <select multiple name="allergy" style="margin-top: 55px;width: 100%;" id="allergy" >
+              Выберите продукт, который хотели бы исключить из меню </h6> </label> <br>
+          <select name="allergy" style="margin-top: 55px;width: 100%;" id="allergy" >
               <option selected value="NULL">---</option>
-              <option  value="Сыр">Сыр</option>
-              <option value="Молоко">Молоко</option>
+              <option value="Молоко">Молочное</option>
               <option value="Орехи">Орехи</option>
               <option value="Мучное">Мучное</option>
               <option value="яйца">Яйца</option>

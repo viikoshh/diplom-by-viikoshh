@@ -14,18 +14,31 @@
 
     <main class="form-signin">
      <div class="container">
-      <form class="form">
-        <h1 class="h3 mb-3 fw-normal">Вход</h1>
+      <h1 class="h3 mb-3 fw-normal" style="margin-top: 50px; margin-left: 50px">Вход</h1>
+      {% if auth_error %}
+            <div class="message" style="background-color: #ff577b">
+                {{ auth_error }}
+            </div>
+         {% endif %}
+      <form method="post" class="form" style="margin-top: 20px;margin-left: auto;margin-right: auto">
+
 
         <div class="form-floating">
-          <input type="email" class="form-control" id="floatingInput" placeholder="Login">
+          <input name="login" type="login" class="form-control" id="floatingInput" placeholder="Login">
           <label for="floatingInput">Логин</label>
         </div>
         <div class="form-floating">
-          <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+          <input name="password" type="password" class="form-control" id="floatingPassword" placeholder="Password">
           <label for="floatingPassword">Пароль</label>
         </div>
-
+          <!--
+        <div class="field">
+                <label class="checkbox">
+                    <input type="checkbox" name="remember">
+                    Remember me
+                </label>
+        </div>
+        /-->
 
         <div>
             <a href="/sign" class="up nav-link px-2 link-dark">Еще не зарегистрированы?</a>

@@ -8,6 +8,7 @@ Smart-Cafe
 
 <main id="main">
 
+
         <!-- слайдшоу/-->
         <section id="slaidshow">
             <!-- Slideshow container -->
@@ -46,6 +47,8 @@ Smart-Cafe
                 </div>
         </section>
 
+        <div> <h1>{{ content }}</h1></div>
+
 
         <section class="about-us" id="about">
             <div class="container">
@@ -78,9 +81,15 @@ Smart-Cafe
                               <input type="checkbox" class="read-more-checker" id="read-more-checker{{ el.id }}">
                               <div class="card-body limited">
                                 <div class="d-flex justify-content-between align-items-center">
+                                    {% if current_user.is_authenticated %}
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-sm btn-outline-secondary">Заказать</button>
                                     </div>
+                                    {% endif %}
+                                    {% if not current_user.is_authenticated %}
+                                    <div class="card-text">Зарегистрируйтесь, чтобы заказать</div>
+                                    {% endif %}
+
                                 </div>
                                 <br>
                                 <p class="card-text" >Масса: {{el.weight}}г</p>
@@ -106,7 +115,7 @@ Smart-Cafe
               </div>
             </div><br><br><br><br>
         </section>
-        <section id="Contact">
+        <section  id="Contact">
 
             <div class="content">
                 <h2 class="menu">Наши контакты</h2>
@@ -169,6 +178,7 @@ Smart-Cafe
                 </div>
 
         </section>
+
     </main>
 
 {% endblock %}
