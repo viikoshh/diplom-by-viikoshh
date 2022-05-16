@@ -1,6 +1,6 @@
 from flask import Flask, render_template, session, request, redirect, Markup
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user
+from flask_login import LoginManager, UserMixin,  login_required, login_user, current_user, logout_user
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -53,10 +53,24 @@ class Client(UserMixin, db.Model):
         return
 
 
+@app.route('/logout/')
+@login_required
+def logout():
+    logout_user()
+    return redirect('/')
+
+
 @app.route('/')
 def index():
     items = Item.query.order_by(Item.id).all()
     return render_template('index.html', data=items)
+
+
+@app.route('/admin')
+@login_required
+def admin_index():
+    items = Item.query.order_by(Item.id).all()
+    return render_template('index_admin.html', data=items)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -65,17 +79,21 @@ def login():
         login = request.form['login']
         password = request.form['password']
 
-        user = Client.query.filter_by(login=login).first()#
+        user = Client.query.filter_by(login=login).first()
         if not user or not check_password_hash(user.password_hash, password):
             auth_error = Markup('Ошибка! Повторите попытку авторизации')
             return render_template('login.html', auth_error=auth_error)
         login_user(user)
-        return redirect('/')
+        if current_user.login == 'admin_viikoshh':
+            return redirect('/admin')
+        else:
+            return redirect('/')
     else:
         return render_template('login.html')
 
 
 @app.route('/sign', methods=['GET','POST'])
+@login_required
 def sign():
     #if 'hash' in session:
     #    connection = sqlite3.connect('base_menu.db')

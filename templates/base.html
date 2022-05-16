@@ -22,11 +22,11 @@
             <li><a href="#menu" class="menu-up nav-link px-2 link-dark">Меню</a></li>
             <li><a href="#" class="menu-up nav-link px-2 link-dark">Заказ</a></li>
             <li><a href="#Contact" class="menu-up nav-link px-2 link-dark">Контакты</a></li>
-            <li><a href="/create" class="menu-up nav-link px-2 link-dark">Добавить блюдо</a></li>
-        </ul>
+            {% block create_admin %}{% endblock %}
+            </ul>
         <div class="rightbtn col-md-3 text-end login">
           {% if current_user.is_authenticated %}
-          <a type="button" class="btn btn-outline-primaryy me-2" style="border-color: #000;" href="#">Выход</a>
+          <a type="button" class="btn btn-outline-primaryy me-2" style="border-color: #000;" href="/logout">Выход</a>
           {% endif %}
           {% if not current_user.is_authenticated %}
           <a type="button" class="btn btn-outline-primaryy me-2" href="/login">Вход</a>

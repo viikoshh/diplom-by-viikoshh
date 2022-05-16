@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Smart-Cafe
+Admin
+{% endblock %}
+
+{% block create_admin %}
+<li><a href="/create" class="menu-up nav-link px-2 link-dark">Добавить блюдо</a></li>
 {% endblock %}
 
 {% block main %}
@@ -47,7 +51,6 @@ Smart-Cafe
                 </div>
         </section>
 
-        <div> <h1>{{ content }}</h1></div>
 
 
         <section class="about-us" id="about">
@@ -83,7 +86,7 @@ Smart-Cafe
                                 <div class="d-flex justify-content-between align-items-center">
                                     {% if current_user.is_authenticated %}
                                     <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">Заказать</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary">Изменить</button>
                                     </div>
                                     {% endif %}
                                     {% if not current_user.is_authenticated %}
