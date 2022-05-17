@@ -4,6 +4,8 @@
 Smart-Cafe
 {% endblock %}
 
+
+
 {% block main %}
 
 <main id="main">
@@ -67,10 +69,12 @@ Smart-Cafe
         </section>
         <section id="menu">
             <h2 class="menu">Меню</h2>
+            <form method="post">
             <div class="container">
                 <div class="cont">
                     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" name="1 pos">
                       {% for el in data %}
+
                       <div class="col">
                           <div class="card shadow-sm">
                               <div class="image image-menu">
@@ -82,15 +86,20 @@ Smart-Cafe
                               <div class="card-body limited">
                                 <div class="d-flex justify-content-between align-items-center">
                                     {% if current_user.is_authenticated %}
-                                    <div class="btn-group">
+                                    <!--<div class="btn-group">
                                         <button type="button" class="btn btn-sm btn-outline-secondary">Заказать</button>
+                                    </div> /-->
+                                    <div style="margin-left: auto; margin-right: auto; margin-top: 0px;">
+                                            <input type="checkbox" name="dishID" value="{{ el.id }}" class="order-checker" id="order-checker{{ el.id }}">
+                                            <label type="button" for="order-checker{{ el.id }}"class="order-button btn-groupp btn btn-sm btn-outline-secondary">
+                                            </label>
+
+
                                     </div>
                                     {% endif %}
                                     {% if not current_user.is_authenticated %}
-                                    <div class="card-text">Зарегистрируйтесь, чтобы заказать</div>
+                                    <div class="card-text"><b>Зарегистрируйтесь, чтобы заказать</b></div>
                                     {% endif %}
-
-
                                 </div>
                                 <br>
                                 <p class="card-text" >Масса: {{el.weight}}г</p>
@@ -106,15 +115,25 @@ Smart-Cafe
                             <label for="read-more-checker{{ el.id }}" class="read-more-button"> </label>
                           </div>
                       </div>
+
+
                      {% endfor %}
 
+                     <div style="margin: auto;width: 30%">
+                          <br><br><br>
+
+                          <button class="w-100 btn btn-lg btn-warning" type="submit" style="margin: auto;">обновить</button>
+
+                      </div>
 
 
 
 
                 </div>
               </div>
-            </div><br><br><br><br>
+            </div>
+            </form>
+                <br><br><br><br>
         </section>
         <section  id="Contact">
 

@@ -2,6 +2,7 @@ from flask import Flask, render_template, session, request, redirect, Markup
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin,  login_required, login_user, current_user, logout_user
 import sqlite3
+import json
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -19,6 +20,15 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(id):
     return Client.query.get(int(id))
+
+
+class Orders(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    loginID = db.Column(db.String(100), nullable=False)
+    orderlist = db.Column(db.Text, nullable=False)
+
+    def __repr__(self):
+        return
 
 
 class Item(db.Model):
@@ -63,6 +73,7 @@ def logout():
 @app.route('/')
 def index():
     items = Item.query.order_by(Item.id).all()
+
     return render_template('index.html', data=items)
 
 
@@ -87,7 +98,7 @@ def login():
         if current_user.login == 'admin_viikoshh':
             return redirect('/admin')
         else:
-            return redirect('/')
+            return redirect('/menu')
     else:
         return render_template('login.html')
 
@@ -119,7 +130,6 @@ def sign():
         telephone = request.form['telephone']
         categorya = request.form['categorya']
         allergy = request.form['allergy']
-        print(allergy)
         password = request.form['password']
         password_hash = generate_password_hash(password)
         connection = sqlite3.connect('base_menu.db')
@@ -138,7 +148,7 @@ def sign():
             email_incorrect = Markup('Такой email уже существует!')
             connection.close()
             return render_template('sign.html', email_incorrect=email_incorrect)
-        client = Client(name_client=name_client, login=login, password_hash=password_hash, email=email, telephone=telephone, categorya=categorya, allergy=allergy)
+        client = Orders(name_client=name_client, login=login, password_hash=password_hash, email=email, telephone=telephone, categorya=categorya, allergy=allergy)
         #hash = generate_password_hash(password)
         #result = check_password_hash(hash, password)
         #if result:
@@ -151,7 +161,7 @@ def sign():
         try:
             db.session.add(client)
             db.session.commit()
-            return redirect('/')
+            return redirect('/menu')
         except:
             message_error = Markup('Возникла ошибка! Проверьте, все ли поля заполнены')
             connection.close()
@@ -159,6 +169,71 @@ def sign():
         connection.close()
     else:
         return render_template('sign.html')
+
+
+@app.route('/menu', methods=['GET','POST'])
+@login_required
+def menu():
+    items = Item.query.order_by(Item.id).all()
+    if request.method == "POST":
+        #connection = sqlite3.connect('base_menu.db')
+        # connection = sqlite3.connect('///home/viikoshh/diplom-by-viikoshh/base_menu.db')
+        #cur = connection.cursor()
+
+        dishID_list = request.form.getlist('dishID')
+        # если корзина ещё не создана
+        if not session.get('cart'):
+            session['cart'] = []
+
+        # добавляем инфу о товаре в список
+        session['cart'] += dishID_list
+
+        #str1 = json.dumps(dishID_list)
+        #cur.execute("INSERT INTO orders (loginID,orderlist) VALUES ('"+current_user.login+"','"+str1+"');")
+        #for i in dishID_list:
+        #    cur.execute("SELECT id,name FROM item WHERE id='" + str(int(i)) + "'")
+        #    rows = cur.fetchall()
+        #    for row in rows:
+        #        print(row)
+        ##order = Client(loginID=current_user.login, orderlist=str1)
+        ##connection.commit()
+        #if len(dishID_list) > 0:
+        #    print(1)
+        return redirect('/cart')
+        #return 'OK'
+
+    else:
+        return render_template('index.html', data=items)
+
+
+@app.route('/cart', methods=['GET','POST'])
+@login_required
+def cart():
+    orderlist = session['cart']
+    connection = sqlite3.connect('base_menu.db')
+    # connection = sqlite3.connect('///home/viikoshh/diplom-by-viikoshh/base_menu.db')
+    cur = connection.cursor()
+    order_items = list()
+    for i in orderlist:
+        cur.execute("SELECT id,name,photo, price FROM item WHERE id='" + str(int(i)) + "'")
+        current_order = [*(cur.fetchall()), 1, 1]
+        order_items.append(current_order)
+    #print(order_items)
+    if request.method == "POST":
+        count = request.form.getlist('count')
+        for i in range(len(order_items)):
+            order_items[i][1] = int(count[i])
+            #price = order_items[i][0][3]
+            order_items[i][2] = int(count[i]) * order_items[i][0][3]
+        #print(order_items)
+        return render_template('cart.html', order=order_items)
+
+    #    redirect('/cart')
+    #session.pop('cart', None)
+    return render_template('cart.html', order=order_items)
+    #return render_template('cart.html')
+
+
 
 
 @app.route('/create', methods=['POST', 'GET'])
@@ -182,7 +257,7 @@ def create():
         try:
             db.session.add(item)
             db.session.commit()
-            return redirect('/')
+            return redirect('/admin')
         except:
             return "Не все поля заполнены!"
 

@@ -322,6 +322,22 @@ color: #4b4b4b;;background: #ffffff; border: 1px solid #b4b4b4; border-radius: 4
     max-height: none;
 }
 
+.order-checker{opacity: 0; position: absolute;}
+/*.order-button{width: 90px;height: 25px;cursor: pointer;font-size: 13px; text-align: center;padding: 1px 10px; display: inline-block;
+color: #4b4b4b;;background: #ffffff; border: 1px solid #b4b4b4; border-radius: 4px;} */
+
+.order-button{width: 90px; border-radius: 4px;}
+
+.order-button:after{
+    content: 'Заказать';
+}
+.order-checker:checked ~ .order-button:after{
+    content: 'В корзине';
+    width: 10px;
+
+}
+
+
 .weight{
     font-size: 14px;
     font-style: italic;;
