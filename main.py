@@ -289,6 +289,9 @@ def order():
     order_cur = Orders.query.get(id[0])
     if request.method == "POST":
         order_cur.status = 'Получен'
+        session.pop('cart', None)
+        session.pop('order', None)
+        session.pop('data', None)
         try:
             db.session.commit()
             print('OK')
