@@ -175,16 +175,15 @@ def sign():
             email_incorrect = Markup('Такой email уже существует!')
             connection.close()
             return render_template('sign.html', email_incorrect=email_incorrect)
-        client = Orders(name_client=name_client, login=login, password_hash=password_hash, email=email, telephone=telephone, categorya=categorya, allergy=allergy)
+        client = Client(name_client=name_client, login=login, password_hash=password_hash, email=email, telephone=telephone, categorya=categorya, allergy=allergy)
         try:
             db.session.add(client)
             db.session.commit()
-            return redirect('/menu')
+            return redirect('/login')
         except:
             message_error = Markup('Возникла ошибка! Проверьте, все ли поля заполнены')
             connection.close()
             return render_template('sign.html', message_error=message_error)
-        connection.close()
     else:
         return render_template('sign.html')
 
