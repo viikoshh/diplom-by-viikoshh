@@ -4,6 +4,7 @@
 body{
     background-image: url("image/фон.jpg");
     background-repeat: repeat;
+    height: 100%;
 }
 header{
     margin: 10px 25px;
@@ -22,8 +23,34 @@ header{
     border: 1px solid #ffc107;
     border-radius: 5px;
     right: 20px;
+    top: 85%;
     position: fixed;
 }
+
+#cart{
+    width: 75px;
+    height: 75px;
+    line-height: 35px;
+    background: rgba(77, 255, 7, 1);
+    opacity: .8;
+    border: 1px solid #209d00;
+    border-radius: 50%;
+    left: 20px;
+    top: 85%;
+    position: fixed;
+}
+
+.cart{
+    font-size: 20px;
+    font-style: italic;
+    text-align: center;
+    font-weight: bolder;
+    text-decoration:none;
+    margin: auto;
+}
+
+
+
 
 main{margin-top:30px;}
 .login{ margin-left: auto;margin-right: 0;}
@@ -151,7 +178,13 @@ button{text-transform:none;}
 .col-md-auto{flex:0 0 auto;width:auto;}
 .col-md-3{flex:0 0 auto;width:25%;}
 }
-.btn{display:inline-block;font-weight:400;line-height:1.5;color:#212529;text-align:center;text-decoration:none;vertical-align:middle;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;user-select:none;background-color:transparent;border:1px solid transparent;padding:.375rem .75rem;font-size:1rem;border-radius:.25rem;transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;}
+.btn{display:inline-block;font-weight:400;line-height:1.5;color:#212529;text-align:center;
+    text-decoration:none;vertical-align:middle;cursor:pointer;
+
+    -webkit-user-select:none;-moz-user-select:none;
+    user-select:none;background-color:transparent;border:1px solid transparent;
+    padding:.375rem .75rem;font-size:1rem;border-radius:.25rem;
+    transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;}
 @media (prefers-reduced-motion:reduce){
 .btn{transition:none;}
 }
@@ -177,12 +210,14 @@ button{text-transform:none;}
 .btn-warning:active:focus{box-shadow:0 0 0 .25rem rgba(217,164,6,.5);}
 .btn-warning:disabled{color:#000;background-color:#ffc107;border-color:#ffc107;}
 
-.btn-outline-secondary{color:#6c757d;border-color:#6c757d;}
+.btn-outline-secondary{color: #6c757d;border-color:#6c757d;}
 .btn-outline-secondary:hover{color:#fff;background-color:#6c757d;border-color:#6c757d;}
 .btn-outline-secondary:focus{box-shadow:0 0 0 .25rem rgba(108,117,125,.5);}
 .btn-outline-secondary:active{color:#fff;background-color:#6c757d;border-color:#6c757d;}
 .btn-outline-secondary:active:focus{box-shadow:0 0 0 .25rem rgba(108,117,125,.5);}
 .btn-outline-secondary:disabled{color:#6c757d;background-color:transparent;}
+
+
 
 .btn-group{position:relative;display:inline-flex;vertical-align:middle;margin: 0px 40%}
 .btn-group>.btn{position:relative;flex:1 1 auto;}
@@ -353,8 +388,7 @@ footer{
     height: 70px;
     text-align: center;
     padding: 20px;
-    margin-top: 30px;
-    bottom: 0;
+    margin-top: 100px;
     width: 100%;
 }
 
@@ -442,3 +476,43 @@ footer{
 #add_item{
     height: 1200px;
 }
+/*
+.btn-submit {
+    background-color: #fff ; border: 1px solid #6c757d
+}
+.btn-submit:hover{
+    color:#fff;background-color:#6c757d;border-color:#6c757d;
+}
+*/
+.btnbtn{
+    background-color: #fff;
+}
+.btnbtn:hover{
+    background-color: 6c757d;
+}
+.btn-submit{color: #86929a;border-color:#6c757d}
+.btn-submit:hover{color:#fff;background-color:#6c757d;border-color:#6c757d;}
+.btn-submit:focus{box-shadow:0 0 0 .25rem rgba(108,117,125,.5);}
+.btn-submit:active{color:#fff;background-color:#6c757d;border-color:#6c757d;}
+.btn-submit:active:focus{box-shadow:0 0 0 .25rem rgba(108,117,125,.5);}
+.btn-submit:disabled{color:#6c757d;background-color:transparent;}
+
+/*
+.btnbtn{display:inline-block;font-weight:400;line-height:1.5;color:#86929a;text-align:center;
+    text-decoration:none;vertical-align:middle;cursor:pointer;
+
+    -webkit-user-select:none;-moz-user-select:none;
+    user-select:none;background-color:transparent;border:1px solid transparent;
+    padding:.375rem .75rem;font-size:1rem;border-radius:.25rem;
+    transition:color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;}
+@media (prefers-reduced-motion:reduce){
+.btnbtn{transition:none;}
+}
+.btnbtn:hover{color:#fff;}
+.btnbtn:focus{outline:0;box-shadow:0 0 0 .25rem rgba(255, 193, 7,.25);}
+.btnbtn:disabled{pointer-events:none;opacity:.65;}
+*/
+
+
+
+

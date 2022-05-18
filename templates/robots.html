@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %} Оформить заказ {% endblock %}
+
+{% block link %}
+
+
+{% endblock %}
+
+{% block main %}
+<main>
+
+      <!-- Title -->
+      <div class="title">
+        Robots
+      </div>
+	{% for i in range(statelist|length) %}
+    <div>
+    <div>
+	<span>Состояние робота {{i}}: </span>
+	<span name="robot">{{statelist[i]}}</span>
+    </div>
+	<span>STATION</span><span id="train">:<img src="https://img.icons8.com/nolan/2x/r2-d2.png">:</span><span id="tablename" style="margin:400px" >TABLE</span>
+    </div>
+	{% endfor %}
+    <form method="post" name="sendform">
+	<input hidden="hidden" type="text" name="type" value="send">
+	<input type="number" name="table" value="1">
+	<button type="button" id="sendData1" onclick='sendData("sendform")' style="margin: auto;"> Послать робота к столу </button>
+    </form>
+    <form method="post" name="comebackform">
+	<input hidden="hidden" type="text" name="type" value="comeback">
+	<input type="number" name="robot" value="0">
+	<button type="button" onclick='sendData("comebackform")' style="margin: auto;"> Вернуть робота </button>
+    </form>
+	<p id="result">result:{{result}}</p>
+	
+	<form method="post" name="refreshform">
+      <div style="margin: auto;width: 30%">
+	<input hidden="hidden" type="text" name="type" value="refresh">
+           <button  type="button" onclick='sendData("refresh")' style="margin: auto;">Обновить</button>
+      </div>
+    </form>
+
+
+    <script type="text/javascript">
+	//sendData1.onclick = sendData("sendform")
+	//sendData("123")
+	function sendData(formname){
+	if(formname == "sendform"){
+	formData = new FormData(document.forms.sendform);
+	}
+	if(formname == "comebackform"){
+	formData = new FormData(document.forms.comebackform);
+	}
+	if(formname == "refresh"){
+	formData = new FormData(document.forms.refreshform);
+	}
+	
+	var xhr = new XMLHttpRequest();
+    method = "POST",
+    url = "/robots/";
+	xhr.open(method, url, true);
+	xhr.onreadystatechange = function () {
+			if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+				console.log(xhr.responseText);
+				collection1 = document.getElementsByName("robot")
+				answer = JSON.parse(xhr.responseText)
+				for(i=0;i<collection1.length;i++) {
+					collection1[i].textContent=answer["statelist"][i]
+					if(answer["statelist"][i] == "waiting"){
+						train[i].style.left = 400 + 'px';
+					}
+				}
+				document.getElementById("result").textContent="result:"+answer["result"]
+				if((answer["result"] != "failure") && (answer["result"] != "no commands")){
+				if (answer["dst"]=="station")
+				RobotAnimation(answer['time'],answer["id"],1)
+					tablename[parseInt(answer["id"])].textContent="TABLE "+answer["table"]
+					
+				}
+				if (answer["dst"]=="table"){
+					RobotAnimation(answer['time'],answer["id"],0)
+					tablename[parseInt(answer["id"])].textContent="TABLE "+answer["table"]
+				}
+			}
+		};
+	xhr.send(formData);
+	};
+	function RobotAnimation(time,id,dst){
+	id=parseInt(id)
+	time = time*1000
+	let min = dst*400
+	let rad = min
+	let max = (1-dst)*400
+	let start = Date.now(); // запомнить время начала
+	
+	
+	let timer = setInterval(function() {
+	// сколько времени прошло с начала анимации?
+	let timePassed = Date.now() - start;
+	let dx = (max-min)/time*20
+	rad = rad+dx;
+	//rad = dx*timePassed;
+	if (timePassed >= time) {
+		clearInterval(timer); // закончить анимацию через 2 секунды
+		draw(max,id)
+		sendData("refresh")
+		return;
+	}
+	// отрисовать анимацию на момент timePassed, прошедший с начала анимации
+	draw(rad,id);
+	}, 20);
+	
+	// в то время как timePassed идёт от 0 до 2000
+	// left изменяет значение от 0px до 400px
+	
+	}
+	function draw(distance,id) {
+	train[id].style.left = distance + 'px';
+	}
+    </script>
+  <style>
+    #train {
+      position: relative;
+      cursor: pointer;
+    }
+  </style>
+
+</main>
+{% endblock %}

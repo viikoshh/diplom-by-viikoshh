@@ -49,7 +49,20 @@ Smart-Cafe
                 </div>
         </section>
 
-        <div> <h1>{{ content }}</h1></div>
+    <!-- <div style="margin: auto;width: 30%">
+                          <br><br><br>
+
+                          <button class="w-100 btn btn-lg btn-warning" type="submit" style="margin: auto;">обновить</button>
+
+                      </div>/-->
+    {% if current_user.is_authenticated %}
+       <form method="post">
+        <button id="cart" type="submit">
+            <p class="cart">Заказ</p>
+        </button>
+    {% endif %}
+
+
 
 
         <section class="about-us" id="about">
@@ -69,7 +82,7 @@ Smart-Cafe
         </section>
         <section id="menu">
             <h2 class="menu">Меню</h2>
-            <form method="post">
+
             <div class="container">
                 <div class="cont">
                     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3" name="1 pos">
@@ -118,13 +131,13 @@ Smart-Cafe
 
 
                      {% endfor %}
-
-                     <div style="margin: auto;width: 30%">
+                        <div style="margin: auto;width: 30%">
                           <br><br><br>
 
                           <button class="w-100 btn btn-lg btn-warning" type="submit" style="margin: auto;">обновить</button>
 
                       </div>
+
 
 
 
@@ -135,6 +148,8 @@ Smart-Cafe
             </form>
                 <br><br><br><br>
         </section>
+
+
         <section  id="Contact">
 
             <div class="content">

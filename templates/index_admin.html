@@ -8,6 +8,7 @@ Admin
 
 {% block create_admin %}
 <li><a href="/create" class="menu-up nav-link px-2 link-dark">Добавить блюдо</a></li>
+<li><a href="/robots/" class="menu-up nav-link px-2 link-dark">Роботы</a></li>
 {% endblock %}
 
 {% block main %}
@@ -88,12 +89,11 @@ Admin
                                 <div class="d-flex justify-content-between align-items-center">
                                     {% if current_user.is_authenticated %}
                                     <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">Изменить</button>
+                                        <a type="button" style="float: left; margin-right: 5%; margin-left: -50%" href="/admin/{{ el.id }}/delete" class="btn btn-sm btn-outline-secondary">Удалить</a>
+                                        <a type="button" style="float: right" href="/admin/{{ el.id }}/update" class="btn btn-sm btn-outline-secondary">Изменить</a>
                                     </div>
                                     {% endif %}
-                                    {% if not current_user.is_authenticated %}
-                                    <div class="card-text">Зарегистрируйтесь, чтобы заказать</div>
-                                    {% endif %}
+
 
 
                                 </div>

@@ -1,5 +1,5 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto:300,400,500);
-
+@import url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 * {
   box-sizing: border-box;
 }
@@ -8,7 +8,8 @@ html,
 body {
   background-image: url("image/фон.jpg");
   background-repeat: repeat;
-  font-family: 'Roboto', sans-serif;
+
+
 }
 
 .shopping-cart {
@@ -131,9 +132,10 @@ body {
   font-weight: 300;
 }
 
-button[class*=btn] {
+.button-plus-minus {
   width: 30px;
   height: 30px;
+
   background-color: #E1E8EE;
   border-radius: 6px;
   border: none;
@@ -185,4 +187,20 @@ input:focus {
   .buttons {
     margin-right: 20px;
   }
+}
+
+
+.itog{
+  font-weight: bold;
+  font-style: italic;
+  font-size: 18px;
+
+}
+.div-itog{
+  width: 75px;
+  height: 55px;
+  line-height: 35px;
+  background: #fff;
+  margin-left: auto;
+  margin-right: 20%;
 }
