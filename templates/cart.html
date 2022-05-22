@@ -1,139 +1,245 @@
-{% extends 'base.html' %}
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-{% block title %} Оформить заказ {% endblock %}
-
-{% block link %}
-<link rel="stylesheet" href="{{ url_for('static', filename='style_cart.css') }}">
-<script src="https://code.jquery.com/jquery-2.2.4.js" charset="utf-8"></script>
-
-{% endblock %}
-
-{% block main %}
-<main>
-
-      {% if not session.get('cart') %}
-    <h3 style="text-align: center">Вы еще ничего не выбрали </h3>
-      {% endif %}
-    <form method="post">
-    <div class="shopping-cart">
-      {% for el in order %}
-      <div class="item" style="height: 180px">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_slide.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://kit.fontawesome.com/ffa5f3e78c.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_cart.css') }}">
+    <script src="https://code.jquery.com/jquery-2.2.4.js" charset="utf-8"></script>
 
 
-        <div class="image" style="width: 300px; height: 200px; margin-top: auto">
-          <img src="{{ el[0][2] }}" width="280" height="140" alt="" />
-        </div>
 
-        <div style="margin-top:auto; margin-bottom: auto">
-            <div class="description" style="width: 300px; font-size: 16px">
-                <p>{{ el[0][1] }}</p>
+    <title>Оформить заказ</title>
+</head>
+<body>
+
+        <div class="container" style="min-height: 100%">
+        <header id="header" class="header d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+            <!--
+            <ul class="nav leftstr col-12 col-md-auto mb-2 justify-content-center mb-md-0" style="width: 50%; margin-right: auto">
+                <li><a href="/menu" class="menu-up nav-link px-2 link-dark">Главная</a></li>
+                <li><a href="/menu#about" class="menu-up nav-link px-2 link-dark">О нас</a></li>
+                <li><a href="/menu#menu" class="menu-up nav-link px-2 link-dark">Меню</a></li>
+                <li><a href="/menu#Contact" class="menu-up nav-link px-2 link-dark">Контакты</a></li>
+            </ul>
+            /-->
+
+
+            <div class="rightbtn col-md-3 text-end login" style="width: 25%; margin-top: 0px; margin-right: 10%">
+              <a type="button" class="btn btn-outline-primaryy me-2" style="border-color: #000;" href="/logout">Выход</a>
             </div>
-        </div>
+        </header>
+  	</div>
 
 
-        <div style="margin-top:auto; margin-bottom: auto">
-        <div class="quantity">
-          <button id="{{el[0][0]}}" class="plus-btn button-plus-minus" type="submit" name="button">
-            <img src="static/cart/plus.svg" alt="" />
-          </button>
-          <input type="text" name="count" value="{{ el[1] }}">
-          <button id="{{el[0][0]}}" class="minus-btn button-plus-minus" type="submit" name="button">
-            <img src="static/cart/minus.svg" alt="" />
-          </button>
-        </div>
-        </div>
 
-        <div style="margin: auto">
-            <p id="startprice {{el[0][0]}}" style="margin-top: 25px;margin-bottom: 0px; font-size: 12px">{{ el[0][3] }} р/шт</p>
-            <p name="cost" id="price {{el[0][0]}}" style="font-size: 18px; font-weight: bold; margin-top: 0px">{{ el[2] }} р </p>
-        </div>
+    
+	<main style="min-height: 480px">
 
-      </div>
-      {% endfor %}
-        <div class="div-itog">
-            <p id="allcost" class="itog">Итого: </p>        
-        </div>
+        <form method="post" id="form_cart" name="form_cart">
+        <div class="btn-group" style="background-color: #fff; width: 20%;margin:auto; display: block">
+             <button type="submit" name="sub_cart" value="Вернуться к меню" style=" float: left; margin-right: 10%; " class="btn btn-sm btn-outline-secondary">
+                 Вернуться к меню
+             </button>
+             <button type="submit" name="sub_cart" value="Очистить корзину" style=" float: right"  class="btn btn-sm btn-outline-secondary">
+                 Очистить корзину
+             </button>
+            </div>
         <br>
+        {% if len_order == 0 %}
+            <br>
+        <h3 style="text-align: center">Вы еще ничего не выбрали </h3>
+        {% endif %}
 
-                <div class="btn-group" style="background-color: #fff; width: 20%;margin:auto">
-                    <a type="button" style=" float: left; margin-right: 10%; " href="/menu#menu" class="btn btn-sm btn-outline-secondary">Вернуться к меню</a>
-                    <a type="button" style=" float: right" href="/cart/delete" class="btn btn-sm btn-outline-secondary">Очистить корзину</a>
+
+
+        <div class="shopping-cart">
+        {% for el in order %}
+        <div class="item" style="height: 180px">
+
+
+            <div class="image" style="width: 300px; height: 200px; margin-top: auto">
+            <img src="{{ el[0][2] }}" width="280" height="140" alt="" />
+            </div>
+
+            <div style="margin-top:auto; margin-bottom: auto">
+                <div class="description" style="width: 300px; font-size: 16px">
+                    <p>{{ el[0][1] }}</p>
                 </div>
-        <br><br>
+            </div>
 
 
-        <div class="btn-group" style="margin: auto; width: 13%">
-            <button type="submit" style=" float: left; margin-right: 10%;width: 30%; height: 20%;border-color: #6c757d" class="btn btn-success">
-                   Перейти к оплате</button>
+            <div style="margin-top:auto; margin-bottom: auto">
+            <div class="quantity">
+            <button id="{{el[0][0]}}" class="plus-btn button-plus-minus" type="submit" name="button">
+                <img src="static/cart/plus.svg" alt="" />
+            </button>
+            <input type="text" name="count" value="{{ el[1] }}">
+            <button id="{{el[0][0]}}" class="minus-btn button-plus-minus" type="submit" name="button">
+                <img src="static/cart/minus.svg" alt="" />
+            </button>
+            </div>
+            </div>
+
+            <div style="margin: auto">
+                <p id="startprice {{el[0][0]}}" style="margin-top: 25px;margin-bottom: 0px; font-size: 12px">{{ el[0][3] }} р/шт</p>
+                <p name="cost" id="price {{el[0][0]}}" style="font-size: 18px; font-weight: bold; margin-top: 0px">{{ el[2] }} р </p>
+            </div>
+
         </div>
+        {% endfor %}
+            <div class="div-itog">
+                <p id="allcost" name="itog"  class="itog">Итого: </p>
+            </div>
+            <br>
+
+            <div class="btn-group" style="margin: auto; width: 13%">
+                <button type="submit"  name="sub_cart" value="Подтвердить заказ" style=" width: 30%; height: 20%;border-color: #6c757d" class="btn btn-success">
+                 Подтвердить заказ
+                        </button>
+            </div>
+</div>
+        </form>
+
+            <br><br>
 
 
 
 
-    </div>
 
 
 
-    <script type="text/javascript">
-	window.onload = updatecost()
-	function updatecost() {
-	allcost=0
-	collection = document.getElementsByName("cost")
-	for(i=0;i<collection.length;i++) {
-		allcost= allcost + parseInt(collection[i].textContent)
-	}
-	document.getElementById("allcost").textContent = "Итого: "+ allcost+" p. "
-	};
-      $('.minus-btn').on('click', function(e) {
-    		e.preventDefault();
-    		var $this = $(this);
-    		var $input = $this.closest('div').find('input');
-    		var $input = $this.closest('div').find('input');
-    		var value = parseInt($input.val());
-
-			//alert(priceVal)
-			// = value+" р."
-    		if (value > 1) {
-    			value = value - 1;
-    		} else {
-    			value = 0;
-    		}
-			var price = document.getElementById("price "+dataida.attr("id"));
-			priceVal = parseInt(price.textContent)
-			price.textContent = String(value*parseInt(document.getElementById("startprice "+dataida.attr("id")).textContent))+" p"
-
-
-        $input.val(value);
-		updatecost()
-    	});
-
-    	$('.plus-btn').on('click', function(e) {
-    		e.preventDefault();
-			dataida=$(this)
-    		var $this = $(this);
-    		var $input = $this.closest('div').find('input');
-    		var value = parseInt($input.val());
-
-    		if (value < 100) {
-      		value = value + 1;
-    		} else {
-    			value =100;
-    		}
-			var price = document.getElementById("price "+dataida.attr("id"));
-			priceVal = parseInt(price.textContent)
-			price.textContent = String(value*parseInt(document.getElementById("startprice "+dataida.attr("id")).textContent))+" p"
-
-    		$input.val(value);
-			updatecost()
-    	});
-
-      $('.like-btn').on('click', function() {
-        $(this).toggleClass('is-active');
-      });
-
+            <script type="text/javascript">
+      function DoPost() {
+        document.form_cart.submit();
+        window.location.href = "/menu";
+      }
     </script>
 
 
-    </form>
-</main>
-{% endblock %}
+
+               <script type="text/javascript">
+        window.onload = updatecost()
+        function updatecost() {
+        allcost=0
+        collection = document.getElementsByName("cost")
+        for(i=0;i<collection.length;i++) {
+            allcost= allcost + parseInt(collection[i].textContent)
+        }
+        document.getElementById("allcost").textContent = "Итого: "+ allcost+" p. "
+        };
+        $('.minus-btn').on('click', function(e) {
+                e.preventDefault();
+                dataida=$(this)
+                var $this = $(this);
+                var $input = $this.closest('div').find('input');
+                var value = parseInt($input.val());
+
+                //alert(priceVal)
+                // = value+" р."
+                if (value > 1) {
+                    value = value - 1;
+                } else {
+                    value = 0;
+                }
+                var price = document.getElementById("price "+dataida.attr("id"));
+                priceVal = parseInt(price.textContent)
+                price.textContent = String(value*parseInt(document.getElementById("startprice "+dataida.attr("id")).textContent))+" p"
+
+
+            $input.val(value);
+            updatecost()
+            });
+
+            $('.plus-btn').on('click', function(e) {
+                e.preventDefault();
+                dataida=$(this)
+                var $this = $(this);
+                var $input = $this.closest('div').find('input');
+                var value = parseInt($input.val());
+
+                if (value < 100) {
+                value = value + 1;
+                } else {
+                    value =100;
+                }
+                var price = document.getElementById("price "+dataida.attr("id"));
+                priceVal = parseInt(price.textContent)
+                price.textContent = String(value*parseInt(document.getElementById("startprice "+dataida.attr("id")).textContent))+" p"
+
+                $input.val(value);
+                updatecost()
+            });
+
+        $('.like-btn').on('click', function() {
+            $(this).toggleClass('is-active');
+        });
+        $(".return_menu").on('click', function(){
+	    		sendAjaxForm( 'form-cart', 'main.py');
+                window.location.href = "/menu";
+	    		return false;
+	    	}
+	    );
+        function sendAjaxForm(ajax_form, url) {
+            $.ajax({
+                url: url, //url страницы (action_ajax_form.php)
+                type: "POST", //метод отправки
+                data: ajax_form.serialize()  // Сеарилизуем объект
+
+
+            });
+        }
+
+
+
+        </script>
+
+
+
+
+
+    </main>
+        
+        
+        
+        
+        
+    <footer id="footer" style="bottom: 0px;top: 10%">
+        <div class="container">
+            <h5>ООО"Умное кафе"</h5>
+        </div>
+    </footer>
+
+
+            <script>
+            var slideIndex = 0;
+            showSlides();
+
+            function showSlides() {
+                var i;
+                var slides = document.getElementsByClassName("mySlides");
+                var dots = document.getElementsByClassName("dot");
+                for (i = 0; i < slides.length; i++) {
+                   slides[i].style.display = "none";
+                }
+                slideIndex++;
+                if (slideIndex > slides.length) {slideIndex = 1}
+                for (i = 0; i < dots.length; i++) {
+                    dots[i].className = dots[i].className.replace(" active", "");
+                }
+                slides[slideIndex-1].style.display = "block";
+                dots[slideIndex-1].className += " active";
+                setTimeout(showSlides, 2000); // Change image every 2 seconds
+            }
+            </script>
+
+
+</body>
+</html>

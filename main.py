@@ -23,6 +23,30 @@ def load_user(id):
     return Client.query.get(int(id))
 
 
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=True)
+
+    def __repr__(self):
+        return
+
+
+class Season(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    time_year = db.Column(db.String(100), nullable=True)
+
+    def __repr__(self):
+        return
+
+
+class Time_day(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    day_time = db.Column(db.String(100), nullable=True)
+
+    def __repr__(self):
+        return
+
+
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     loginID = db.Column(db.String(100), nullable=False)
@@ -69,6 +93,8 @@ class Client(UserMixin, db.Model):
 @app.route('/logout/')
 @login_required
 def logout():
+    for key in list(session.keys()):
+        session.pop(key)
     logout_user()
     return redirect('/')
 
@@ -85,6 +111,35 @@ def index():
 def admin_index():
     items = Item.query.order_by(Item.id).all()
     return render_template('index_admin.html', data=items)
+
+
+@app.route('/kitchen/order')
+@login_required
+def kitchen_order():
+    data = str(datetime.datetime.now().date())
+    print(data)
+    orders_act = Orders.query.filter(Orders.data == data, Orders.status == 'Готовится')
+    order_items_act = []
+    for order_id in orders_act:
+        arr = json.loads(order_id.orderlist)
+        ord = []
+        for pos in arr:
+            pos = int(pos)
+            item = Item.query.get(pos)
+            ord.append([item.name, arr[str(pos)]])
+        order_items_act.append(ord)
+    orders_old = Orders.query.filter(Orders.data == data, Orders.status == 'Получен')
+    order_items_old = []
+    for order_id in orders_old:
+        arr = json.loads(order_id.orderlist)
+        ord = []
+        for pos in arr:
+            pos = int(pos)
+            item = Item.query.get(pos)
+            ord.append([item.name, arr[str(pos)]])
+        order_items_old.append(ord)
+
+    return render_template('kitchen_order.html', orders=order_items_act, orders_old=order_items_old)
 
 
 @app.route('/admin/<int:id>/delete')
@@ -129,6 +184,38 @@ def admin_update(id):
         return render_template('item_update.html', item=item)
 
 
+@app.route('/create', methods=['POST', 'GET'])
+def create():
+    categoryes = Category.query.order_by(Category.id).all()
+    season = Season.query.order_by(Season.id).all()
+    time_day = Time_day.query.order_by(Time_day.id).all()
+    if request.method == "POST":
+        name = request.form['name']
+        photo = request.form['photo']
+        price = request.form['price']
+        weight = request.form['weight']
+        composition = request.form['composition']
+        KBJU = request.form['KBJU']
+        discover_text = request.form['discover_text']
+        discover_url = request.form['discover_url']
+        season = request.form['season']
+        time_day = request.form['time_day']
+        category = request.form['category']
+        #connection = sqlite3.connect('base_menu.db')
+
+        item = Item(name=name, photo=photo, price=price, weight=weight, composition=composition, KBJU=KBJU, discover_text=discover_text, discover_url=discover_url, season=season, time_day=time_day, category=category)
+
+        try:
+            db.session.add(item)
+            db.session.commit()
+            return redirect('/admin')
+        except:
+            return "Не все поля заполнены!"
+
+    else:
+        return render_template('create.html', categoryes=categoryes, season=season, time_day=time_day)
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == "POST":
@@ -150,6 +237,7 @@ def login():
 
 @app.route('/sign', methods=['GET','POST'])
 def sign():
+    categoryes = Category.query.order_by(Category.id).all()
     if request.method == "POST":
         name_client = request.form['name_client']
         login = request.form['login']
@@ -185,20 +273,31 @@ def sign():
             connection.close()
             return render_template('sign.html', message_error=message_error)
     else:
-        return render_template('sign.html')
+        return render_template('sign.html', categoryes=categoryes)
 
 
 @app.route('/menu', methods=['GET','POST'])
 @login_required
 def menu():
     items = Item.query.order_by(Item.id).all()
+    session['status'] = 0
     if request.method == "POST":
         dishID_list = request.form.getlist('dishID')
         # если корзина ещё не создана
-        if not session.get('cart'):
-            session['cart'] = []
+        if not session.get('order'):
+            session['order'] = ''
+            orderlist = {}
+        else:
+            orderl = session['order']
+            orderlist = json.loads(orderl)
         # добавляем инфу о товаре в список
-        session['cart'] += dishID_list
+        for i in dishID_list:
+            if i not in orderlist:
+                orderlist[i] = 1
+            else:
+                orderlist[i] += 1
+        order_cur = json.dumps(orderlist)
+        session['order'] = order_cur
         return redirect('/cart')
 
     else:
@@ -208,51 +307,90 @@ def menu():
 @app.route('/cart/delete')
 def delete_cart():
     # если корзина ещё не создана
-    if not session.get('cart'):
+    if not session.get('order'):
         redirect('/menu')
-    session.pop('cart', None)
+    session.pop('order', None)
     return redirect('/menu')
 
 
 @app.route('/cart', methods=['GET','POST'])
 @login_required
 def cart():
-    orderlist = session['cart']
+    orderl = session['order']
+    orderlist = json.loads(orderl)
     connection = sqlite3.connect('base_menu.db')
     # connection = sqlite3.connect('///home/viikoshh/diplom-by-viikoshh/base_menu.db')
     cur = connection.cursor()
     order_items = list()
-    for i in orderlist:
+    for i in orderlist.keys():
         cur.execute("SELECT id,name,photo, price FROM item WHERE id='" + str(int(i)) + "'")
         sp = cur.fetchall()
-        current_order = [*sp, 1, sp[0][-1]]
+        current_order = [*sp, orderlist[i], sp[0][-1]]
         order_items.append(current_order)
-    order_id = set()
+    order_id = {}
     orders = []
-    for i in order_items:
-        if i[0][0] not in order_id:
-            order_id.add(i[0][0]);
-            orders.append(i)
+    for i in range(len(order_items)):
+        if order_items[i][0][0] not in order_id:
+            # order_id.add(order_items[i][0][0]);
+            order_id[order_items[i][0][0]] = order_items[i][1]
+            orders.append(order_items[i])
+        else:
+            for j in orders:
+                if j == order_items[i]:
+                    j[1] += order_items[i][1]
+                    order_id[order_items[i][0][0]] = j[1]
+        order_items[i][2] = order_items[i][1] * order_items[i][0][3]
     order_items = orders.copy()
-    # Если заказ еще не сформирован
-    if not session.get('order'):
-        session['order'] = []
-    order_cur = json.dumps(list(order_id))
+    len_order = len(order_items)
+    order_cur = json.dumps(order_id)
     session['order'] = order_cur
-    #print(session['order'])
+    # print(session['order'])
     if request.method == "POST":
         count = request.form.getlist('count')
-        cost = 0
+        #cost = request.form('itog')
+        #if not session.get('cost'):
+        #    session['cost'] = 0
+        #session['cost'] = cost
+        empt = []
         for i in range(len(order_items)):
-            order_items[i][1] = int(count[i])
-            order_items[i][2] = int(count[i]) * order_items[i][0][3]
-            cost += order_items[i][2]
-        return redirect('/pay')
+            c = int(count[i])
+            if c > 0:
+                order_items[i][1] = c
+                order_items[i][2] = c * order_items[i][0][3]
+                order_id[order_items[i][0][0]] = order_items[i][1]
+            else:
+                empt.append(order_items[i])
+        print(order_items)
+        for i in empt:
+            order_items.remove(i)
+            order_id.pop(i[0][0], 100)
+        #return redirect('/cart')
 
-    #    redirect('/cart')
-    #session.pop('cart', None)
-    return render_template('cart.html', order=order_items)
-    #return render_template('cart.html')
+        order_cur = json.dumps(order_id)
+        session['order'] = order_cur
+        print(order_items)
+        if request.form['sub_cart'] == 'Вернуться к меню':
+            return redirect('/menu')
+        elif request.form['sub_cart'] == 'Очистить корзину':
+            return redirect('/cart/delete')
+        elif request.form['sub_cart'] == 'Подтвердить заказ':
+            return redirect('/confirm_order')
+
+    return render_template('cart.html', order=order_items, len_order=len_order)
+
+
+@app.route('/confirm_order', methods=['GET','POST'])
+@login_required
+def confirm():
+    orderlist = json.loads(session['order'])
+    #cost = session['cost']
+    order_items = []
+    cost = 0
+    for i in orderlist:
+        item = Item.query.get(i)
+        order_items.append([item.name, orderlist[i], item.price * orderlist[i]])
+        cost += item.price * orderlist[i]
+    return render_template("confirm_order.html", order_items=order_items, cost=cost)
 
 
 @app.route('/pay', methods=['GET','POST'])
@@ -260,13 +398,18 @@ def cart():
 def pay():
     if request.method == "POST":
         loginID = current_user.login
-        orderlist= session['order']
+        orderlist = session['order']
         status = 'Готовится'
-        data = str(datetime.datetime.now())
+        if not session.get('status'):
+            session['status'] = 0
+        session['status'] = status
+        data = str(datetime.datetime.now().date())
         if not session.get('data'):
             session['data'] = 0
         session['data'] = data
         order = Orders(loginID=loginID, orderlist=orderlist, status=status, data=data)
+
+        session.pop('order', None)
         try:
             db.session.add(order)
             db.session.commit()
@@ -289,9 +432,8 @@ def order():
     order_cur = Orders.query.get(id[0])
     if request.method == "POST":
         order_cur.status = 'Получен'
-        session.pop('cart', None)
-        session.pop('order', None)
         session.pop('data', None)
+        session.pop('status', None)
         try:
             db.session.commit()
             print('OK')
@@ -305,36 +447,11 @@ def order():
     return render_template('order.html')
 
 
-@app.route('/create', methods=['POST', 'GET'])
-def create():
-    if request.method == "POST":
-        name = request.form['name']
-        photo = request.form['photo']
-        price = request.form['price']
-        weight = request.form['weight']
-        composition = request.form['composition']
-        KBJU = request.form['KBJU']
-        discover_text = request.form['discover_text']
-        discover_url = request.form['discover_url']
-        season = request.form['season']
-        time_day = request.form['time_day']
-        category = request.form['category']
-        #connection = sqlite3.connect('base_menu.db')
-
-        item = Item(name=name, photo=photo, price=price, weight=weight, composition=composition, KBJU=KBJU, discover_text=discover_text, discover_url=discover_url, season=season, time_day=time_day, category=category)
-
-        try:
-            db.session.add(item)
-            db.session.commit()
-            return redirect('/admin')
-        except:
-            return "Не все поля заполнены!"
-
-    else:
-        return render_template('create.html')
+#class Set_of_order():
 
 
-### НАЧАЛО ИЗМЕНЕНИЙ
+
+### Роботы
 # from time import time
 import time
 

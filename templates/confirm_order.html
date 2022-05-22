@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Подтверждение заказа
+{% endblock %}
+
+
+
+{% block main %}
+<main style="min-height: 500px">
+    <h2 style="text-align: center">Проверьте правильность заказа</h2>
+    <div class="order_check">
+        <h4> Вы выбрали: </h4>
+        <ol>
+        {% for el in order_items %}
+            <li>{{el[0]}}, {{ el[1] }} шт. - {{ el[2] }} р. </li>
+        {% endfor %}
+        </ol>
+    </div>
+    <div>
+        <h4 style="text-align: center"> Итого: {{ cost }} р.</h4>
+    </div>
+    <br>
+    <div class="btn-group" style="margin:auto; display: block; width: 20%">
+        <a type="button"  href="/cart" style="float:left;margin-right: 5%; width: 47%; height: 20%;border-color: #6c757d" class="btn btn-success">
+            Вернуться к корзине
+        </a>
+        <a type="button" href="/pay" style=" float: right;width: 47%; height: 20%;border-color: #6c757d" class="btn btn-success">
+            Перейти к оплате
+        </a>
+    </div>
+
+
+
+
+</main>
+
+{% endblock %}

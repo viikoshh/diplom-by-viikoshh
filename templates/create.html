@@ -35,30 +35,25 @@
                 <br>
                 <label for="category"> <h6>Категория блюда: </h6> </label> <br>
                 <select name="category" id="category" size="1">
-                    <option  value="выпечка">Выпечка</option>
-                    <option value="горячие напитки">Горячие напитки</option>
-                    <option value="прохладные напитки">Прохладительные напитки</option>
-                    <option value="готовое">Готовые блюда</option>
-                    <option value="мороженное">Мороженное</option>
-                    <option value="салаты">Салаты</option>
-                    <option value="печенье">Печенье</option>
-                    <option value="сэндвичи">Сэндвичи</option>
-                    <option value="салаты">Салаты</option>
+                    {% for el in categoryes %}
+                    <option  value="{{ el.id }}">{{ el.name }}</option>
+                    {% endfor %}
                 </select>
                 <br>
                 <label for="season"> <h6>Сезонность блюда: </h6> </label> <br>
                 <select name="season" id="season" size="1">
                     <option selected value="NULL">---</option>
-                    <option  value="зима">Зимнее блюдо</option>
-                    <option value="лето">Летнее блюдо</option>
+                    {% for els in season %}
+                    <option  value="{{ els.id }}">{{ els.time_year }}</option>
+                    {% endfor %}
                 </select>
                 <br>
                 <label for="time_day"> <h6>В какое время это блюдо наиболее востребовано: </h6> </label> <br>
                 <select name="time_day" id="time_day" size="1">
                     <option selected value="NULL">---</option>
-                    <option value="утро">Утреннее блюдо</option>
-                    <option value="день">Дневное блюдо</option>
-                    <option value="вечер">Вечернее блюдо</option>
+                    {% for elt in time_day %}
+                    <option  value="{{ elt.id }}">{{ elt.day_time }}</option>
+                    {% endfor %}
                 </select>
                 <br><br>
                 <button class="btn btn-success">Добавить позицию меню</button>
