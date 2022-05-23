@@ -449,10 +449,10 @@ footer{
 .map-google{margin: 30px 12.5%;}
 .leftstr{
     float: left; /* Обтекание справа */
-    width: 80%; /* Ширина текстового блока */
+    width: 75%; /* Ширина текстового блока */
 }
 .rightbtn {
-    width: 19%;
+    width: 22%;
     text-align: right; /* Выравнивание по правому краю */
 }
 .card-text{

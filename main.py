@@ -5,6 +5,7 @@ import sqlite3
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
+from random import sample, choice
 
 app = Flask(__name__)
 app.debug = True
@@ -84,10 +85,68 @@ class Client(UserMixin, db.Model):
     email = db.Column(db.String(100), nullable=False, unique=True)
     telephone = db.Column(db.String(100), nullable=True)
     categorya = db.Column(db.String(100), nullable=True)
-    allergy = db.Column(db.String(100), nullable=True)
 
     def __repr__(self):
         return
+
+
+def AISeason():
+    month = int(datetime.datetime.now().month)
+    #month = 1
+    if month in range(5, 10):
+        ses = Season.query.filter(Season.time_year == 'Летнее').first()
+        h5 = "Освежитесь!"
+    else:
+        ses = Season.query.filter(Season.time_year == 'Зимнее').first()
+        h5 = "Согрейтесь!"
+    rec_ses = Item.query.filter(Item.season == ses.id)
+    rec_id = []
+    for i in rec_ses:
+        rec_id.append(i.photo)
+    print(rec_id)
+    a, b = tuple(sample(rec_id, 2))
+    return a,b, h5
+
+
+def AIDay():
+    hour = int(datetime.datetime.now().hour)
+    #hour = 17
+    if hour in range(5, 12):
+        ses = Time_day.query.filter(Time_day.day_time == 'Утреннее').first()
+        h5 = "С завтрака все начинается!"
+    if hour in range(12, 18):
+        ses = Time_day.query.filter(Time_day.day_time == 'Дневное').first()
+        h5 = "Не забедьте пообедать"
+    else:
+        ses = Time_day.query.filter(Time_day.day_time == 'Вечернее').first()
+        h5 = "Проведите вечер вкусно"
+    rec_ses = Item.query.filter(Item.time_day == ses.id)
+    rec_id = []
+    for i in rec_ses:
+        rec_id.append(i.photo)
+    a, b = tuple(sample(rec_id, 2))
+    return a, b, h5
+
+
+def AILoveCat(id):
+    love = Client.query.get(id)
+    ses = Category.query.filter(Category.name == love.categorya).first()
+    if ses is None:
+        al = Category.query.order_by(Category.id).all()
+        i = []
+        for j in al:
+            i.append(j.id)
+        #ses = choice(i)
+        ses = 2
+        rec_ses = Item.query.filter(Item.category == ses)
+    else:
+        rec_ses = Item.query.filter(Item.id == ses.id)
+    rec_id = []
+    for i in rec_ses:
+        rec_id.append(i.photo)
+    a, b = tuple(sample(rec_id, 2))
+    h5 = "То, что вам понравится"
+    return a,b, h5
 
 
 @app.route('/logout/')
@@ -102,8 +161,9 @@ def logout():
 @app.route('/')
 def index():
     items = Item.query.order_by(Item.id).all()
-
-    return render_template('index.html', data=items)
+    slide_1 = AISeason()
+    slide_2 = AIDay()
+    return render_template('index.html', data=items, s1=slide_1, s2=slide_2)
 
 
 @app.route('/admin')
@@ -244,7 +304,7 @@ def sign():
         email = request.form['email']
         telephone = request.form['telephone']
         categorya = request.form['categorya']
-        allergy = request.form['allergy']
+        #allergy = request.form['allergy']
         password = request.form['password']
         password_hash = generate_password_hash(password)
         connection = sqlite3.connect('base_menu.db')
@@ -279,7 +339,13 @@ def sign():
 @app.route('/menu', methods=['GET','POST'])
 @login_required
 def menu():
+    log = current_user.login
+    client = Client.query.filter(Client.login == log).first()
+    id = client.id
     items = Item.query.order_by(Item.id).all()
+    slide_1 = AISeason()
+    slide_2 = AIDay()
+    slide_3 = AILoveCat(id)
     session['status'] = 0
     if request.method == "POST":
         dishID_list = request.form.getlist('dishID')
@@ -301,7 +367,7 @@ def menu():
         return redirect('/cart')
 
     else:
-        return render_template('index.html', data=items)
+        return render_template('index.html', data=items, s1=slide_1, s2=slide_2, s3=slide_3)
 
 
 @app.route('/cart/delete')
