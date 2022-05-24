@@ -44,6 +44,31 @@
 	<main style="min-height: 480px">
 
         <form method="post" id="form_cart" name="form_cart">
+
+            <br>
+            <h3 style="text-align: center">Самое популярное блюдо за два дня! Попробуйте и вы!</h3>
+            <div class="item" style="height: 180px">
+
+                <div styl></div>
+            <div class="image" style="width: 300px; height: 200px; margin-top: auto">
+            <img src="{{ recomend.photo }}" width="280" height="140" alt="" />
+            </div>
+
+            <div style="margin-top:auto; margin-bottom: auto">
+                <div class="description" style="width: 300px; font-size: 16px">
+                    <p>{{ recomend.name }}</p>
+                </div>
+            </div>
+
+
+            <div class="btn-group" style="margin: auto; width: 13%">
+                <button type="submit"  name="sub_cart" value="Добавить" style=" width: 30%; height: 20%;border-color: #6c757d" class="btn btn-success">
+                 Добавьте в заказ
+                        </button>
+            </div>
+
+        </div>
+            <br>
         <div class="btn-group" style="background-color: #fff; width: 20%;margin:auto; display: block">
              <button type="submit" name="sub_cart" value="Вернуться к меню" style=" float: left; margin-right: 10%; " class="btn btn-sm btn-outline-secondary">
                  Вернуться к меню
@@ -57,10 +82,11 @@
             <br>
         <h3 style="text-align: center">Вы еще ничего не выбрали </h3>
         {% endif %}
+            <br>
 
 
-
-        <div class="shopping-cart">
+        <h3 style="text-align: center">Ваш заказ:</h3>
+        <div class="shopping-cart" style="margin-top: 2%">
         {% for el in order %}
         <div class="item" style="height: 180px">
 
@@ -105,18 +131,39 @@
                  Подтвердить заказ
                         </button>
             </div>
-</div>
+            </div>
+
+        <br>
+            {% if dop_rec != 0 %}
+            <h3 style="text-align: center">Дополните заказ:</h3>
+
+
+            <div class="item" style="height: 180px">
+
+                <div styl></div>
+            <div class="image" style="width: 300px; height: 200px; margin-top: auto">
+            <img src="{{ dop_rec.photo }}" width="280" height="140" alt="" />
+            </div>
+
+            <div style="margin-top:auto; margin-bottom: auto">
+                <div class="description" style="width: 300px; font-size: 16px">
+                    <p>{{ dop_rec.name }}</p>
+                </div>
+            </div>
+            <div class="btn-group" style="margin: auto; width: 13%">
+                <button type="submit"  name="sub_cart" value="Добавить доп" style=" width: 30%; height: 20%;border-color: #6c757d" class="btn btn-success">
+                 Добавьте в заказ
+                        </button>
+            </div>
+
+        </div>
+            <br>
+
+            {% endif %}
         </form>
 
             <br><br>
-
-
-
-
-
-
-
-            <script type="text/javascript">
+    <script type="text/javascript">
       function DoPost() {
         document.form_cart.submit();
         window.location.href = "/menu";

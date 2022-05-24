@@ -92,7 +92,6 @@ class Client(UserMixin, db.Model):
 
 def AISeason():
     month = int(datetime.datetime.now().month)
-    #month = 1
     if month in range(5, 10):
         ses = Season.query.filter(Season.time_year == 'Летнее').first()
         h5 = "Освежитесь!"
@@ -110,7 +109,6 @@ def AISeason():
 
 def AIDay():
     hour = int(datetime.datetime.now().hour)
-    #hour = 17
     if hour in range(5, 12):
         ses = Time_day.query.filter(Time_day.day_time == 'Утреннее').first()
         h5 = "С завтрака все начинается!"
@@ -149,6 +147,92 @@ def AILoveCat(id):
     return a,b, h5
 
 
+def Analyz_for_rec():
+    #Фильтр для анализа и нахождения популярного блюда за последние два дня
+    filter_2_day = datetime.datetime.today() - datetime.timedelta(days=2)
+    order_all = Orders.query.filter(Orders.data >= filter_2_day).all()
+    orders_old = []
+    orders = []
+    client = set()
+    for i in order_all:
+        orders_old.append([i.loginID, json.loads(i.orderlist)])
+        orders.append([i.loginID, {}])
+        client.add(i.loginID)
+    for j in range(len(orders_old)):
+        for k in orders_old[j][1]:
+            orders[j][1][int(k)] = orders_old[j][1][k]
+    count_client = len(client)
+    item_all = Item.query.order_by(Item.id).all()
+    dishes = {}
+    for i in item_all:
+        dishes[i.id] = [i.name, i.category]
+    return orders, count_client, dishes
+
+
+def maxdictkey(dictD):
+    return max(dictD, key=dictD.get)
+
+
+def recomendation(pid, noworder, orders, count_client, dishes):
+    countID = {}
+    countpidID = {}
+    # инициализируем 0 все блюда
+    for dishid in dishes.keys():
+        countID[dishid] = 0
+        countpidID[dishid] = 0
+        # print(dish[0])
+    # считаем популярность всех блюд, за исключением тех которые уже в заказе
+    for order in orders:
+        for i in order[1].keys():
+            if i not in noworder.keys():
+                countID[i] += order[1][i]
+    # считаем популярность всех блюд именно этого клиента, за исключением тех которые уже в заказе
+    for order in orders:
+        if order[0] == pid:
+            for i in order[1].keys():
+                if i not in noworder.keys():
+                    countpidID[i] += order[1][i]
+    #print("Количество заказов", countID)
+    #print("Количество заказов по пользователю", pid, " : ", countpidID)
+    maxdish = max(countID, key=countID.get)
+    maxpiddish = max(countpidID, key=countpidID.get)
+    #print("Больше всего заказываемое блюдо", maxdish)
+    #print("Любимое блюдо пользователя, за исплючением тех, которые уже есть в заказе", maxpiddish)
+    # вычисляем коэффициент
+    pols = 1 * (countID[maxdish] / count_client)
+    piddish = 1.2 * countpidID[maxpiddish]
+    #print("Коэффициент клиента: ", piddish, " Коэффициент остальных: ", pols)
+    return maxdictkey({maxdish: pols, maxpiddish: piddish})
+
+
+set_order = ['2', '8']
+
+
+def issubset_check(set_cat):
+    if set(set_order).issubset(set_cat):
+        return False
+    if set_cat.issubset(set_order):
+        return True
+    flag = False
+    for i in set_order:
+        if set(i).issubset(set_cat):
+            flag = True
+            break
+    return flag
+
+
+def dop_order(set_cat):
+    recomend_cat = []
+    for i in set_order:
+        is_sub = []
+        if set(i).issubset(set_cat):
+            is_sub.append(i)
+    for i in set_order:
+        if i not in is_sub:
+            recomend_cat.append(i)
+    return recomend_cat
+
+
 @app.route('/logout/')
 @login_required
 def logout():
@@ -177,7 +261,6 @@ def admin_index():
 @login_required
 def kitchen_order():
     data = str(datetime.datetime.now().date())
-    print(data)
     orders_act = Orders.query.filter(Orders.data == data, Orders.status == 'Готовится')
     order_items_act = []
     for order_id in orders_act:
@@ -210,7 +293,7 @@ def admin_delete(id):
         db.session.commit()
         return redirect('/admin')
     except:
-        return "При удалении статьи произошла ошибка"
+        return "При удалении блюда произошла ошибка"
 
 
 @app.route('/admin/<int:id>/update', methods=['GET', 'POST'])
@@ -323,7 +406,7 @@ def sign():
             email_incorrect = Markup('Такой email уже существует!')
             connection.close()
             return render_template('sign.html', email_incorrect=email_incorrect)
-        client = Client(name_client=name_client, login=login, password_hash=password_hash, email=email, telephone=telephone, categorya=categorya, allergy=allergy)
+        client = Client(name_client=name_client, login=login, password_hash=password_hash, email=email, telephone=telephone, categorya=categorya)
         try:
             db.session.add(client)
             db.session.commit()
@@ -346,8 +429,10 @@ def menu():
     slide_1 = AISeason()
     slide_2 = AIDay()
     slide_3 = AILoveCat(id)
-    session['status'] = 0
+    if not session.get('status'):
+        session['status'] = 'В ожидании заказа'
     if request.method == "POST":
+
         dishID_list = request.form.getlist('dishID')
         # если корзина ещё не создана
         if not session.get('order'):
@@ -407,16 +492,36 @@ def cart():
                     order_id[order_items[i][0][0]] = j[1]
         order_items[i][2] = order_items[i][1] * order_items[i][0][3]
     order_items = orders.copy()
-    len_order = len(order_items)
+
+    orders_all, count_client_all, items_all = Analyz_for_rec()
+    id_rec = recomendation(current_user.login, order_id, orders_all, count_client_all, items_all)
+    item_rec = Item.query.get(id_rec)
+
+    dop_rec = 0
+    set_cat = set()
+    for i in order_id.keys():
+        item = Item.query.get(int(i))
+        set_cat.add(item.category)
+    flag = issubset_check(set_cat)
+    if len(order_id) == 0:
+        flag = False
+    if flag == True:
+        dop_cat = dop_order(set_cat)
+        random_id = []
+        for i in dop_cat:
+            dop_rec_items = Item.query.filter(Item.category == i)
+            for k in dop_rec_items:
+                random_id.append(k.id)
+        dop_rec_i = choice(random_id)
+        dop = Item.query.get(dop_rec_i)
+        dop_rec = dop
+
     order_cur = json.dumps(order_id)
     session['order'] = order_cur
+    len_order = len(order_items)
     # print(session['order'])
     if request.method == "POST":
         count = request.form.getlist('count')
-        #cost = request.form('itog')
-        #if not session.get('cost'):
-        #    session['cost'] = 0
-        #session['cost'] = cost
         empt = []
         for i in range(len(order_items)):
             c = int(count[i])
@@ -426,30 +531,60 @@ def cart():
                 order_id[order_items[i][0][0]] = order_items[i][1]
             else:
                 empt.append(order_items[i])
-        print(order_items)
         for i in empt:
             order_items.remove(i)
             order_id.pop(i[0][0], 100)
-        #return redirect('/cart')
-
         order_cur = json.dumps(order_id)
         session['order'] = order_cur
-        print(order_items)
         if request.form['sub_cart'] == 'Вернуться к меню':
             return redirect('/menu')
         elif request.form['sub_cart'] == 'Очистить корзину':
             return redirect('/cart/delete')
         elif request.form['sub_cart'] == 'Подтвердить заказ':
             return redirect('/confirm_order')
+        elif request.form['sub_cart'] == 'Добавить':
+            item = [[item_rec.id, item_rec.name, item_rec.photo, item_rec.price], 1, item_rec.price]
+            order_id[item_rec.id] = 1
+            order_items.append(item)
+            order_cur = json.dumps(order_id)
+            session['order'] = order_cur
 
-    return render_template('cart.html', order=order_items, len_order=len_order)
+            dop_rec = 0
+            set_cat = set()
+            for i in order_id.keys():
+                item = Item.query.get(int(i))
+                set_cat.add(item.category)
+            flag = issubset_check(set_cat)
+            if len(order_id) == 0:
+                flag = False
+            if flag == True:
+                dop_cat = dop_order(set_cat)
+                dop_rec_items = Item.query.filter(Item.category == dop_cat)
+                idd = []
+                for i in dop_rec_items:
+                    idd.append(i.id)
+                dop_rec_i = choice(idd)
+                dop = Item.query.get(dop_rec_i)
+                dop_rec = dop
+
+            return render_template('cart.html', order=order_items, len_order=len_order, recomend=item_rec, dop_rec=dop_rec, flag=flag)
+        elif request.form['sub_cart'] == 'Добавить доп':
+            dop_item = [[dop_rec.id, dop_rec.name, dop_rec.photo, dop_rec.price], 1, dop_rec.price]
+            order_id[dop_rec.id] = 1
+            order_items.append(dop_item)
+            order_cur = json.dumps(order_id)
+            session['order'] = order_cur
+            flag = 'False'
+            return render_template('cart.html', order=order_items, len_order=len_order, recomend=item_rec,dop_rec=dop_rec, flag=flag)
+
+    return render_template('cart.html', order=order_items, len_order=len_order, recomend=item_rec, dop_rec=dop_rec, flag=flag)
+
 
 
 @app.route('/confirm_order', methods=['GET','POST'])
 @login_required
 def confirm():
     orderlist = json.loads(session['order'])
-    #cost = session['cost']
     order_items = []
     cost = 0
     for i in orderlist:
@@ -466,8 +601,6 @@ def pay():
         loginID = current_user.login
         orderlist = session['order']
         status = 'Готовится'
-        if not session.get('status'):
-            session['status'] = 0
         session['status'] = status
         data = str(datetime.datetime.now().date())
         if not session.get('data'):
@@ -497,15 +630,14 @@ def order():
     id = cur.fetchall()
     order_cur = Orders.query.get(id[0])
     if request.method == "POST":
+        session['status'] = 'Получен'
         order_cur.status = 'Получен'
         session.pop('data', None)
         session.pop('status', None)
         try:
             db.session.commit()
-            print('OK')
             return redirect('/logout')
         except:
-            print('ERROR')
             return render_template('order.html')
 
 

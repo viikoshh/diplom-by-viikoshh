@@ -81,25 +81,14 @@ Smart-Cafe
             <script src="/examples/vendors/bootstrap-4.1/js/bootstrap.min.js"></script>
         </section>
 
-    <!-- <div style="margin: auto;width: 30%">
-                          <br><br><br>
-
-                          <button class="w-100 btn btn-lg btn-warning" type="submit" style="margin: auto;">обновить</button>
-
-                      </div>/-->
      <form method="post">
     {% if current_user.is_authenticated %}
          {% if session['status'] != 'Готовится' %}
-
         <button id="cart" type="submit">
             <p class="cart">Заказ</p>
         </button>
          {% endif %}
     {% endif %}
-
-
-
-
         <section class="about-us" id="about">
             <div class="container" >
                 <div class="about-us">
@@ -134,15 +123,10 @@ Smart-Cafe
                               <div class="card-body limited">
                                 <div class="d-flex justify-content-between align-items-center">
                                     {% if current_user.is_authenticated %}
-                                    <!--<div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary">Заказать</button>
-                                    </div> /-->
                                     <div style="margin-left: auto; margin-right: auto; margin-top: 0px;">
                                             <input type="checkbox" name="dishID" value="{{ el.id }}" class="order-checker" id="order-checker{{ el.id }}">
                                             <label type="button" for="order-checker{{ el.id }}"class="order-button btn-groupp btn btn-sm btn-outline-secondary">
                                             </label>
-
-
                                     </div>
                                     {% endif %}
                                     {% if not current_user.is_authenticated %}
