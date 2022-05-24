@@ -149,8 +149,9 @@ def AILoveCat(id):
 
 def Analyz_for_rec():
     #Фильтр для анализа и нахождения популярного блюда за последние два дня
-    filter_2_day = datetime.datetime.today() - datetime.timedelta(days=2)
-    order_all = Orders.query.filter(Orders.data >= filter_2_day).all()
+    #filter_2_day = datetime.datetime.today() - datetime.timedelta(days=7)
+    #order_all = Orders.query.filter(Orders.data >= filter_2_day).all()
+    order_all = Orders.query.order_by(Orders.id).all()
     orders_old = []
     orders = []
     client = set()
@@ -193,7 +194,6 @@ def recomendation(pid, noworder, orders, count_client, dishes):
                 if i not in noworder.keys():
                     countpidID[i] += order[1][i]
     #print("Количество заказов", countID)
-    #print("Количество заказов по пользователю", pid, " : ", countpidID)
     maxdish = max(countID, key=countID.get)
     maxpiddish = max(countpidID, key=countpidID.get)
     #print("Больше всего заказываемое блюдо", maxdish)
@@ -205,6 +205,7 @@ def recomendation(pid, noworder, orders, count_client, dishes):
     return maxdictkey({maxdish: pols, maxpiddish: piddish})
 
 
+#Набор заказов для получения рекомендаций на основе собранной корзины, длина списка может быть любой, но он должен быть один
 set_order = ['2', '8']
 
 
@@ -580,7 +581,6 @@ def cart():
     return render_template('cart.html', order=order_items, len_order=len_order, recomend=item_rec, dop_rec=dop_rec, flag=flag)
 
 
-
 @app.route('/confirm_order', methods=['GET','POST'])
 @login_required
 def confirm():
@@ -616,7 +616,6 @@ def pay():
         except:
             return "Что-то пошло не так"
 
-
     return render_template('pay.html')
 
 
@@ -643,10 +642,6 @@ def order():
 
 
     return render_template('order.html')
-
-
-#class Set_of_order():
-
 
 
 ### Роботы
