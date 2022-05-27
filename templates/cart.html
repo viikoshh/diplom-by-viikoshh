@@ -134,7 +134,7 @@
             </div>
 
         <br>
-            {% if dop_rec != 0 %}
+            {% if flag == True %}
             <h3 style="text-align: center">Дополните заказ:</h3>
 
 
@@ -142,12 +142,12 @@
 
                 <div styl></div>
             <div class="image" style="width: 300px; height: 200px; margin-top: auto">
-            <img src="{{ dop_rec.photo }}" width="280" height="140" alt="" />
+            <img src="{{ dop_rec[1]}}" width="280" height="140" alt="" />
             </div>
 
             <div style="margin-top:auto; margin-bottom: auto">
                 <div class="description" style="width: 300px; font-size: 16px">
-                    <p>{{ dop_rec.name }}</p>
+                    <p>{{ dop_rec[0] }}</p>
                 </div>
             </div>
             <div class="btn-group" style="margin: auto; width: 13%">

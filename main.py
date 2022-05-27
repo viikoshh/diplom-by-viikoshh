@@ -102,7 +102,6 @@ def AISeason():
     rec_id = []
     for i in rec_ses:
         rec_id.append(i.photo)
-    print(rec_id)
     a, b = tuple(sample(rec_id, 2))
     return a,b, h5
 
@@ -112,7 +111,7 @@ def AIDay():
     if hour in range(5, 12):
         ses = Time_day.query.filter(Time_day.day_time == 'Утреннее').first()
         h5 = "С завтрака все начинается!"
-    if hour in range(12, 18):
+    elif hour in range(12, 18):
         ses = Time_day.query.filter(Time_day.day_time == 'Дневное').first()
         h5 = "Не забедьте пообедать"
     else:
@@ -128,7 +127,7 @@ def AIDay():
 
 def AILoveCat(id):
     love = Client.query.get(id)
-    ses = Category.query.filter(Category.name == love.categorya).first()
+    ses = Category.query.filter(Category.id == love.categorya).first()
     if ses is None:
         al = Category.query.order_by(Category.id).all()
         i = []
@@ -138,13 +137,13 @@ def AILoveCat(id):
         ses = 2
         rec_ses = Item.query.filter(Item.category == ses)
     else:
-        rec_ses = Item.query.filter(Item.id == ses.id)
+        rec_ses = Item.query.filter(Item.category == ses.id)
     rec_id = []
     for i in rec_ses:
         rec_id.append(i.photo)
     a, b = tuple(sample(rec_id, 2))
     h5 = "То, что вам понравится"
-    return a,b, h5
+    return a, b, h5
 
 
 def Analyz_for_rec():
@@ -212,26 +211,33 @@ set_order = ['2', '8']
 def issubset_check(set_cat):
     if set(set_order).issubset(set_cat):
         return False
-    if set_cat.issubset(set_order):
+    elif set_cat.issubset(set_order):
         return True
-    flag = False
-    for i in set_order:
-        if set(i).issubset(set_cat):
-            flag = True
-            break
-    return flag
+    else:
+        flag = False
+        for i in set_order:
+            if set(i).issubset(set_cat):
+                flag = True
+                break
+        return flag
 
 
 def dop_order(set_cat):
     recomend_cat = []
+    is_sub = []
     for i in set_order:
-        is_sub = []
         if set(i).issubset(set_cat):
             is_sub.append(i)
     for i in set_order:
         if i not in is_sub:
             recomend_cat.append(i)
-    return recomend_cat
+    random_id = []
+    for i in recomend_cat:
+        dop_rec_items = Item.query.filter(Item.category == i)
+        for k in dop_rec_items:
+            random_id.append(k.id)
+    dop_rec_i = choice(random_id)
+    return dop_rec_i
 
 
 @app.route('/logout/')
@@ -462,6 +468,8 @@ def delete_cart():
     if not session.get('order'):
         redirect('/menu')
     session.pop('order', None)
+    session.pop('flag', None)
+    session.pop('dop_id', None)
     return redirect('/menu')
 
 
@@ -498,24 +506,43 @@ def cart():
     id_rec = recomendation(current_user.login, order_id, orders_all, count_client_all, items_all)
     item_rec = Item.query.get(id_rec)
 
-    dop_rec = 0
-    set_cat = set()
-    for i in order_id.keys():
-        item = Item.query.get(int(i))
-        set_cat.add(item.category)
-    flag = issubset_check(set_cat)
-    if len(order_id) == 0:
-        flag = False
-    if flag == True:
-        dop_cat = dop_order(set_cat)
-        random_id = []
-        for i in dop_cat:
-            dop_rec_items = Item.query.filter(Item.category == i)
-            for k in dop_rec_items:
-                random_id.append(k.id)
-        dop_rec_i = choice(random_id)
-        dop = Item.query.get(dop_rec_i)
-        dop_rec = dop
+    if not session.get('flag'):
+        session['flag'] = False
+    if not session.get('dop_id'):
+        session['dop_id'] = 8
+    if session['flag'] == False:
+        dop_rec = 0
+        set_cat = set()
+        for i in order_id.keys():
+            print(order_id)
+            item = Item.query.get(int(i))
+            set_cat.add(item.category)
+        flag = issubset_check(set_cat)
+        if len(order_id) == 0:
+            flag = False
+        if flag == True:
+            dop_rec_i = dop_order(set_cat)
+            dop = Item.query.get(dop_rec_i)
+            dop_id = dop.id
+            dop_name = dop.name
+            dop_photo = dop.photo
+            dop_price = dop.price
+            dop_rec = [dop_name, dop_photo]
+            dop_item = [[dop_id, dop_name, dop_photo, dop_price], 1, dop_price]
+            session['dop_id'] = dop_id
+        session['flag'] = True
+    else:
+        dop_id = session['dop_id']
+        order_id[dop_id] = 1
+        dop = Item.query.get(dop_id)
+        dop_name = dop.name
+        dop_photo = dop.photo
+        dop_price = dop.price
+        dop_rec = [dop_name, dop_photo]
+        dop_item = [[dop_id, dop_name, dop_photo, dop_price], 1, dop_price]
+        flag = True
+
+
 
     order_cur = json.dumps(order_id)
     session['order'] = order_cur
@@ -549,34 +576,59 @@ def cart():
             order_items.append(item)
             order_cur = json.dumps(order_id)
             session['order'] = order_cur
+            orders_all, count_client_all, items_all = Analyz_for_rec()
+            id_rec = recomendation(current_user.login, order_id, orders_all, count_client_all, items_all)
+            item_rec = Item.query.get(id_rec)
 
-            dop_rec = 0
-            set_cat = set()
-            for i in order_id.keys():
-                item = Item.query.get(int(i))
-                set_cat.add(item.category)
-            flag = issubset_check(set_cat)
-            if len(order_id) == 0:
-                flag = False
-            if flag == True:
-                dop_cat = dop_order(set_cat)
-                dop_rec_items = Item.query.filter(Item.category == dop_cat)
-                idd = []
-                for i in dop_rec_items:
-                    idd.append(i.id)
-                dop_rec_i = choice(idd)
-                dop = Item.query.get(dop_rec_i)
-                dop_rec = dop
+            if session['flag'] == False:
+                dop_rec = 0
+                set_cat = set()
+                for i in order_id.keys():
+                    print(order_id)
+                    item = Item.query.get(int(i))
+                    set_cat.add(item.category)
+                flag = issubset_check(set_cat)
+                if len(order_id) == 0:
+                    flag = False
+                if flag == True:
+                    dop_rec_i = dop_order(set_cat)
+                    dop = Item.query.get(dop_rec_i)
+                    dop_id = dop.id
+                    dop_name = dop.name
+                    dop_photo = dop.photo
+                    dop_price = dop.price
+                    dop_rec = [dop_name, dop_photo]
+                    dop_item = [[dop_id, dop_name, dop_photo, dop_price], 1, dop_price]
+                    session['dop_id'] = dop_id
+                session['flag'] = True
+            else:
+                dop_id = session['dop_id']
+                order_id[dop_id] = 1
+                dop = Item.query.get(dop_id)
+                dop_name = dop.name
+                dop_photo = dop.photo
+                dop_price = dop.price
+                dop_rec = [dop_name, dop_photo]
+                dop_item = [[dop_id, dop_name, dop_photo, dop_price], 1, dop_price]
+                flag = True
+
 
             return render_template('cart.html', order=order_items, len_order=len_order, recomend=item_rec, dop_rec=dop_rec, flag=flag)
         elif request.form['sub_cart'] == 'Добавить доп':
-            dop_item = [[dop_rec.id, dop_rec.name, dop_rec.photo, dop_rec.price], 1, dop_rec.price]
-            order_id[dop_rec.id] = 1
+            dop_id = session['dop_id']
+            order_id[dop_id] = 1
+            dop = Item.query.get(dop_id)
+            dop_name = dop.name
+            dop_photo = dop.photo
+            dop_price = dop.price
+            dop_item = [[dop_id, dop_name, dop_photo, dop_price], 1, dop_price]
             order_items.append(dop_item)
             order_cur = json.dumps(order_id)
             session['order'] = order_cur
+            dop_rec = 0
             flag = 'False'
-            return render_template('cart.html', order=order_items, len_order=len_order, recomend=item_rec,dop_rec=dop_rec, flag=flag)
+            session[flag] = flag
+            return render_template('cart.html', order=order_items, len_order=len_order, recomend=item_rec, dop_rec=dop_rec, flag=flag)
 
     return render_template('cart.html', order=order_items, len_order=len_order, recomend=item_rec, dop_rec=dop_rec, flag=flag)
 
