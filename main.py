@@ -113,7 +113,7 @@ def AIDay():
         h5 = "С завтрака все начинается!"
     elif hour in range(12, 18):
         ses = Time_day.query.filter(Time_day.day_time == 'Дневное').first()
-        h5 = "Не забедьте пообедать"
+        h5 = "Не забудьте пообедать"
     else:
         ses = Time_day.query.filter(Time_day.day_time == 'Вечернее').first()
         h5 = "Проведите вечер вкусно"
