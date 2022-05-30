@@ -251,10 +251,13 @@ def logout():
 
 @app.route('/')
 def index():
+    if current_user:
+        redirect('/menu')
     items = Item.query.order_by(Item.id).all()
     slide_1 = AISeason()
     slide_2 = AIDay()
-    return render_template('index.html', data=items, s1=slide_1, s2=slide_2)
+    slide_3 = 0
+    return render_template('index.html', data=items, s1=slide_1, s2=slide_2, s3=slide_3)
 
 
 @app.route('/admin')
@@ -506,41 +509,43 @@ def cart():
     id_rec = recomendation(current_user.login, order_id, orders_all, count_client_all, items_all)
     item_rec = Item.query.get(id_rec)
 
-    if not session.get('flag'):
-        session['flag'] = False
-    if not session.get('dop_id'):
-        session['dop_id'] = 8
-    if session['flag'] == False:
-        dop_rec = 0
-        set_cat = set()
-        for i in order_id.keys():
-            print(order_id)
-            item = Item.query.get(int(i))
-            set_cat.add(item.category)
-        flag = issubset_check(set_cat)
-        if len(order_id) == 0:
-            flag = False
-        if flag == True:
-            dop_rec_i = dop_order(set_cat)
-            dop = Item.query.get(dop_rec_i)
-            dop_id = dop.id
-            dop_name = dop.name
-            dop_photo = dop.photo
-            dop_price = dop.price
-            dop_rec = [dop_name, dop_photo]
-            dop_item = [[dop_id, dop_name, dop_photo, dop_price], 1, dop_price]
-            session['dop_id'] = dop_id
-        session['flag'] = True
-    else:
-        dop_id = session['dop_id']
-        order_id[dop_id] = 1
-        dop = Item.query.get(dop_id)
+    #if not session.get('flag'):
+    #    session['flag'] = False
+
+    #if not session.get('dop_id'):
+    #    session['dop_id'] = 8
+    #if session['flag'] == False:
+    #if flag == False:
+    dop_rec = 0
+    set_cat = set()
+    for i in order_id.keys():
+        print(order_id)
+        item = Item.query.get(int(i))
+        set_cat.add(item.category)
+    flag = issubset_check(set_cat)
+    if len(order_id) == 0:
+        flag = False
+    if flag == True:
+        dop_rec_i = dop_order(set_cat)
+        dop = Item.query.get(dop_rec_i)
+        dop_id = dop.id
         dop_name = dop.name
         dop_photo = dop.photo
         dop_price = dop.price
         dop_rec = [dop_name, dop_photo]
         dop_item = [[dop_id, dop_name, dop_photo, dop_price], 1, dop_price]
-        flag = True
+        session['dop_id'] = dop_id
+    #session['flag'] = True
+    #else:
+    #    dop_id = session['dop_id']
+    #    order_id[dop_id] = 1
+    #    dop = Item.query.get(dop_id)
+    #    dop_name = dop.name
+    #    dop_photo = dop.photo
+    #    dop_price = dop.price
+    #    dop_rec = [dop_name, dop_photo]
+    #    dop_item = [[dop_id, dop_name, dop_photo, dop_price], 1, dop_price]
+    #    flag = True
 
 
 
@@ -549,28 +554,72 @@ def cart():
     len_order = len(order_items)
     # print(session['order'])
     if request.method == "POST":
-        count = request.form.getlist('count')
-        empt = []
-        for i in range(len(order_items)):
-            c = int(count[i])
-            if c > 0:
-                order_items[i][1] = c
-                order_items[i][2] = c * order_items[i][0][3]
-                order_id[order_items[i][0][0]] = order_items[i][1]
-            else:
-                empt.append(order_items[i])
-        for i in empt:
-            order_items.remove(i)
-            order_id.pop(i[0][0], 100)
-        order_cur = json.dumps(order_id)
-        session['order'] = order_cur
         if request.form['sub_cart'] == 'Вернуться к меню':
+            count = request.form.getlist('count')
+            empt = []
+            for i in range(len(order_items)):
+                c = int(count[i])
+                if c > 0:
+                    order_items[i][1] = c
+                    order_items[i][2] = c * order_items[i][0][3]
+                    order_id[order_items[i][0][0]] = order_items[i][1]
+                else:
+                    empt.append(order_items[i])
+            for i in empt:
+                order_items.remove(i)
+                order_id.pop(i[0][0], 100)
+            order_cur = json.dumps(order_id)
+            session['order'] = order_cur
             return redirect('/menu')
         elif request.form['sub_cart'] == 'Очистить корзину':
+            count = request.form.getlist('count')
+            empt = []
+            for i in range(len(order_items)):
+                c = int(count[i])
+                if c > 0:
+                    order_items[i][1] = c
+                    order_items[i][2] = c * order_items[i][0][3]
+                    order_id[order_items[i][0][0]] = order_items[i][1]
+                else:
+                    empt.append(order_items[i])
+            for i in empt:
+                order_items.remove(i)
+                order_id.pop(i[0][0], 100)
+            order_cur = json.dumps(order_id)
+            session['order'] = order_cur
             return redirect('/cart/delete')
         elif request.form['sub_cart'] == 'Подтвердить заказ':
+            count = request.form.getlist('count')
+            empt = []
+            for i in range(len(order_items)):
+                c = int(count[i])
+                if c > 0:
+                    order_items[i][1] = c
+                    order_items[i][2] = c * order_items[i][0][3]
+                    order_id[order_items[i][0][0]] = order_items[i][1]
+                else:
+                    empt.append(order_items[i])
+            for i in empt:
+                order_items.remove(i)
+                order_id.pop(i[0][0], 100)
+            order_cur = json.dumps(order_id)
+            session['order'] = order_cur
             return redirect('/confirm_order')
         elif request.form['sub_cart'] == 'Добавить':
+
+            count = request.form.getlist('count')
+            empt = []
+            for i in range(len(order_items)):
+                c = int(count[i])
+                if c > 0:
+                    order_items[i][1] = c
+                    order_items[i][2] = c * order_items[i][0][3]
+                    order_id[order_items[i][0][0]] = order_items[i][1]
+                else:
+                    empt.append(order_items[i])
+            for i in empt:
+                order_items.remove(i)
+                order_id.pop(i[0][0], 100)
             item = [[item_rec.id, item_rec.name, item_rec.photo, item_rec.price], 1, item_rec.price]
             order_id[item_rec.id] = 1
             order_items.append(item)
@@ -580,54 +629,44 @@ def cart():
             id_rec = recomendation(current_user.login, order_id, orders_all, count_client_all, items_all)
             item_rec = Item.query.get(id_rec)
 
-            if session['flag'] == False:
-                dop_rec = 0
-                set_cat = set()
-                for i in order_id.keys():
-                    print(order_id)
-                    item = Item.query.get(int(i))
-                    set_cat.add(item.category)
-                flag = issubset_check(set_cat)
-                if len(order_id) == 0:
-                    flag = False
-                if flag == True:
-                    dop_rec_i = dop_order(set_cat)
-                    dop = Item.query.get(dop_rec_i)
-                    dop_id = dop.id
-                    dop_name = dop.name
-                    dop_photo = dop.photo
-                    dop_price = dop.price
-                    dop_rec = [dop_name, dop_photo]
-                    dop_item = [[dop_id, dop_name, dop_photo, dop_price], 1, dop_price]
-                    session['dop_id'] = dop_id
-                session['flag'] = True
-            else:
-                dop_id = session['dop_id']
-                order_id[dop_id] = 1
-                dop = Item.query.get(dop_id)
-                dop_name = dop.name
-                dop_photo = dop.photo
-                dop_price = dop.price
-                dop_rec = [dop_name, dop_photo]
-                dop_item = [[dop_id, dop_name, dop_photo, dop_price], 1, dop_price]
-                flag = True
+
+
 
 
             return render_template('cart.html', order=order_items, len_order=len_order, recomend=item_rec, dop_rec=dop_rec, flag=flag)
         elif request.form['sub_cart'] == 'Добавить доп':
             dop_id = session['dop_id']
-            order_id[dop_id] = 1
             dop = Item.query.get(dop_id)
             dop_name = dop.name
             dop_photo = dop.photo
             dop_price = dop.price
             dop_item = [[dop_id, dop_name, dop_photo, dop_price], 1, dop_price]
+            count = request.form.getlist('count')
+            empt = []
+            for i in range(len(order_items)):
+                c = int(count[i])
+                if c > 0:
+                    order_items[i][1] = c
+                    order_items[i][2] = c * order_items[i][0][3]
+                    order_id[order_items[i][0][0]] = order_items[i][1]
+                else:
+                    empt.append(order_items[i])
+            for i in empt:
+                order_items.remove(i)
+                order_id.pop(i[0][0], 100)
+
+
+            order_id[dop_id] = 1
             order_items.append(dop_item)
             order_cur = json.dumps(order_id)
             session['order'] = order_cur
             dop_rec = 0
             flag = 'False'
-            session[flag] = flag
+            id_rec = recomendation(current_user.login, order_id, orders_all, count_client_all, items_all)
+            item_rec = Item.query.get(id_rec)
+            #session[flag] = flag
+
+
             return render_template('cart.html', order=order_items, len_order=len_order, recomend=item_rec, dop_rec=dop_rec, flag=flag)
 
     return render_template('cart.html', order=order_items, len_order=len_order, recomend=item_rec, dop_rec=dop_rec, flag=flag)

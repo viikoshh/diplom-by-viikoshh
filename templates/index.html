@@ -82,12 +82,13 @@ Smart-Cafe
         </section>
 
      <form method="post">
+         {% if s3 != 0 %}
     {% if current_user.is_authenticated %}
          {% if session['status'] != 'Готовится' %}
         <button id="cart" type="submit">
             <p class="cart">Заказ</p>
         </button>
-         {% endif %}
+         {% endif %}{% endif %}
     {% endif %}
         <section class="about-us" id="about">
             <div class="container" >
